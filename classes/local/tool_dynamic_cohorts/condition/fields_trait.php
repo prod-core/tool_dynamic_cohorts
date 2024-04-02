@@ -58,6 +58,20 @@ trait fields_trait {
     }
 
     /**
+     * Gets a list of comparison operators for date fields.
+     *
+     * @return array A list of operators.
+     */
+    protected function get_date_operators(): array {
+        return [
+            self::DATE_IS_AFTER => get_string('isafter', 'tool_dynamic_cohorts'),
+            self::DATE_IS_BEFORE => get_string('isbefore', 'tool_dynamic_cohorts'),
+            self::TEXT_IS_EMPTY => get_string('isempty', 'filters'),
+            self::TEXT_IS_NOT_EMPTY => get_string('isnotempty', 'tool_dynamic_cohorts'),
+        ];
+    }
+
+    /**
      * Returns a field name for the configured field.
      *
      * @return string
@@ -109,7 +123,9 @@ trait fields_trait {
                 case self::FIELD_DATA_TYPE_CHECKBOX:
                     $fieldvalue = $fieldinfo[$fieldname]->param1[$fieldvalue];
                     break;
-
+                case self::FIELD_DATA_TYPE_DATE:
+                case self::FIELD_DATA_TYPE_DATETIME:
+                    $fieldvalue = userdate($fieldvalue);
             }
         }
 
@@ -136,15 +152,16 @@ trait fields_trait {
      * @return string
      */
     protected function get_operator_text(string $fielddatatype): string {
-        if ($fielddatatype == self::FIELD_DATA_TYPE_TEXT) {
-            return $this->get_text_operators()[$this->get_operator_value()];
+        switch ($fielddatatype) {
+            case self::FIELD_DATA_TYPE_MENU:
+            case self::FIELD_DATA_TYPE_SELECT:
+                return $this->get_menu_operators()[$this->get_operator_value()];
+            case self::FIELD_DATA_TYPE_DATETIME:
+            case self::FIELD_DATA_TYPE_DATE:
+                return $this->get_date_operators()[$this->get_operator_value()];
+            default:
+                return $this->get_text_operators()[$this->get_operator_value()];
         }
-
-        if ($fielddatatype == self::FIELD_DATA_TYPE_MENU) {
-            return $this->get_menu_operators()[$this->get_operator_value()];
-        }
-
-        return $this->get_text_operators()[$this->get_operator_value()];
     }
 
     /**
@@ -203,6 +220,57 @@ trait fields_trait {
         $elements[] = $mform->createElement('select', $shortname . '_value', $field->name, $options);
         $group[] = $mform->createElement('group', $shortname, '', $elements, '', false);
         $mform->hideIf($shortname, self::get_form_field(), 'neq', $shortname);
+    }
+
+    /**
+     * Adds a date field to the form.
+     *
+     * @param \MoodleQuickForm $mform Form to add the field to.
+     * @param array $group A group to add the field to.
+     * @param \stdClass $field Field info.
+     * @param string $shortname A field shortname.
+     */
+    protected function add_date_field(\MoodleQuickForm $mform, array &$group, \stdClass $field, string $shortname): void {
+        $elements = [];
+        $elements[] = $mform->createElement('select', $shortname . '_operator', null, $this->get_date_operators());
+
+        $elements[] = $mform->createElement('date_time_selector', $shortname . '_value');
+        $mform->setDefault($shortname . '_value', usergetmidnight(time()));
+        $mform->hideIf($shortname . '_value', $shortname . '_operator', 'in', self::TEXT_IS_EMPTY . '|' . self::TEXT_IS_NOT_EMPTY);
+
+        $group[] = $mform->createElement('group', $shortname, '', $elements, '', false);
+
+        $mform->hideIf($shortname . '_operator', static::get_form_field(), 'neq', $shortname);
+        $mform->hideIf($shortname . '_value', static::get_form_field(), 'neq', $shortname);
+        $mform->hideIf($shortname . '_value1', static::get_form_field(), 'neq', $shortname);
+        $mform->hideIf($shortname, static::get_form_field(), 'neq', $shortname);
+    }
+
+    /**
+     * Validate config form elements.
+     *
+     * @param array $data Data to validate.
+     * @return array
+     */
+    public function config_form_validate(array $data): array {
+        $errors = [];
+
+        $fields = $this->get_fields_info();
+        if (empty($data[static::get_form_field()]) || !isset($fields[$data[static::get_form_field()]])) {
+            $errors['fieldgroup'] = get_string('pleaseselectfield', 'tool_dynamic_cohorts');
+        }
+
+        $fieldvalue = $data[static::get_form_field()] . '_value';
+        $operator = $data[static::get_form_field()] . '_operator';
+        $datatype = $fields[$data[static::get_form_field()]]->datatype ?? '';
+
+        if (empty($data[$fieldvalue])) {
+            if ($datatype == 'text' && !in_array($data[$operator], [self::TEXT_IS_EMPTY, self::TEXT_IS_NOT_EMPTY])) {
+                $errors['fieldgroup'] = get_string('invalidfieldvalue', 'tool_dynamic_cohorts');
+            }
+        }
+
+        return $errors;
     }
 
     /**
@@ -296,6 +364,46 @@ trait fields_trait {
             case self::TEXT_IS_NOT_EQUAL_TO:
                 $where = $DB->sql_equal($DB->sql_compare_text("$field"), ":$param", false, false, true);
                 $params[$param] = $fieldvalue;
+                break;
+            default:
+                return new condition_sql('', '', []);
+        }
+
+        return new condition_sql('', $where, $params);
+    }
+
+    /**
+     * Get SQL data for date type fields.
+     *
+     * @param string $tablealias Alias for a table.
+     * @param string $fieldname Field name.
+     * @return condition_sql
+     */
+    protected function get_date_sql(string $tablealias, string $fieldname): condition_sql {
+        $fieldvalue = $this->get_field_value();
+        $operatorvalue = $this->get_operator_value();
+
+        if ($this->is_broken()) {
+            return new condition_sql('', '', []);
+        }
+
+        $param = condition_sql::generate_param_alias();
+        switch ($operatorvalue) {
+            case self::TEXT_IS_EMPTY:
+                $where = "$tablealias.$fieldname = :$param OR $tablealias.$fieldname IS NULL";
+                $params[$param] = 0;
+                break;
+            case self::TEXT_IS_NOT_EMPTY:
+                $where = "$tablealias.$fieldname <> :$param";
+                $params[$param] = (int) $fieldvalue;
+                break;
+            case self::DATE_IS_BEFORE:
+                $where = "$tablealias.$fieldname <= :$param";
+                $params[$param] = (int) $fieldvalue;
+                break;
+            case self::DATE_IS_AFTER:
+                $where = "$tablealias.$fieldname >= :$param";
+                $params[$param] = (int)  $fieldvalue;
                 break;
             default:
                 return new condition_sql('', '', []);
