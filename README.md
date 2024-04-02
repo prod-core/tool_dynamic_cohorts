@@ -1,5 +1,5 @@
 <a href="https://github.com/catalyst/moodle-tool_dynamic_cohorts/actions/workflows/ci.yml?query=branch%3AMOODLE_401_STABLE">
-<img src="https://github.com/catalyst/moodle-tool_dynamic_cohorts/workflows/ci/badge.svg?branch=3AMOODLE_401_STABLE">
+<img src="https://github.com/catalyst/moodle-tool_dynamic_cohorts/workflows/ci/badge.svg?branch=MOODLE_401_STABLE">
 </a>
 
 # Dynamic cohorts #
