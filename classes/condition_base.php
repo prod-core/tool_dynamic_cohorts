@@ -46,6 +46,16 @@ abstract class condition_base {
     public const FIELD_DATA_TYPE_CHECKBOX = 'checkbox';
 
     /**
+     * Value for date field types.
+     */
+    public const FIELD_DATA_TYPE_DATE = 'date';
+
+    /**
+     * Value for date field types.
+     */
+    public const FIELD_DATA_TYPE_DATETIME = 'datetime';
+
+    /**
      * Value for operator text contains.
      */
     public const TEXT_CONTAINS = 1;
@@ -84,6 +94,16 @@ abstract class condition_base {
      * Value for operator text is not equal to.
      */
     public const TEXT_IS_NOT_EQUAL_TO = 8;
+
+    /**
+     * Value for operator date is after.
+     */
+    public const DATE_IS_AFTER = 1;
+
+    /**
+     * Value for operator date is before.
+     */
+    public const DATE_IS_BEFORE = 2;
 
     /**
      * Condition persistent object.

@@ -345,6 +345,33 @@ class cohort_field_test extends \advanced_testcase {
             'A user is member of cohorts with field \'Custom field\' is equal to No',
             $condition->get_config_description()
         );
+
+        $now = time();
+        $datefield = $this->create_cohort_custom_field('datefield', 'date');
+        $datefieldfieldname = cohort_field::CUSTOM_FIELD_PREFIX . $datefield->get('shortname');
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldfieldname,
+            $datefieldfieldname . '_operator' => condition_base::DATE_IS_AFTER,
+            $datefieldfieldname . '_value' => $now,
+        ]);
+
+        $this->assertSame(
+            'A user is member of cohorts with field \'Custom field\' is after ' . userdate($now),
+            $condition->get_config_description()
+        );
+
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldfieldname,
+            $datefieldfieldname . '_operator' => condition_base::DATE_IS_BEFORE,
+            $datefieldfieldname . '_value' => $now,
+        ]);
+
+        $this->assertSame(
+            'A user is member of cohorts with field \'Custom field\' is before ' . userdate($now),
+            $condition->get_config_description()
+        );
     }
 
     /**
@@ -362,12 +389,15 @@ class cohort_field_test extends \advanced_testcase {
         // We need admin to be able to add custom fields data for cohorts.
         $this->setAdminUser();
 
+        $now = time();
         $textfield = $this->create_cohort_custom_field();
         $checkboxfield = $this->create_cohort_custom_field('checkboxfield', 'checkbox');
+        $datefield = $this->create_cohort_custom_field('datefield', 'date');
 
         $cohort1 = $this->getDataGenerator()->create_cohort([
             'customfield_' . $textfield->get('shortname') => 'Test value 1',
             'customfield_' . $checkboxfield->get('shortname') => '1',
+            'customfield_' . $datefield->get('shortname') => $now - WEEKSECS,
         ]);
         $cohort2 = $this->getDataGenerator()->create_cohort();
 
@@ -382,6 +412,7 @@ class cohort_field_test extends \advanced_testcase {
         $totalusers = $DB->count_records('user');
         $textfieldname = cohort_field::CUSTOM_FIELD_PREFIX . $textfield->get('shortname');
         $checkboxfieldname = cohort_field::CUSTOM_FIELD_PREFIX . $checkboxfield->get('shortname');
+        $datefieldname = cohort_field::CUSTOM_FIELD_PREFIX . $datefield->get('shortname');
 
         // User 1 and user 2 as they are members of cohort 1.
         $condition = $this->get_condition([
@@ -443,6 +474,30 @@ class cohort_field_test extends \advanced_testcase {
         $result = $condition->get_sql();
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $this->assertCount(2, $DB->get_records_sql($sql, $result->get_params()));
+
+        // User 1 and user 2 as they are members of cohort 1.
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldname,
+            $datefieldname . '_operator' => condition_base::DATE_IS_BEFORE,
+            $datefieldname . '_value' => $now,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount(2, $DB->get_records_sql($sql, $result->get_params()));
+
+        // All users except user 3 as he is a members of cohort 2.
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_NOT_MEMBER_OF,
+            'cohort_field_field' => $datefieldname,
+            $datefieldname . '_operator' => condition_base::TEXT_IS_EMPTY,
+            $datefieldname . '_value' => $now,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount($totalusers - 1, $DB->get_records_sql($sql, $result->get_params()));
     }
 
     /**

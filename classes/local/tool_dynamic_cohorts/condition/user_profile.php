@@ -84,39 +84,14 @@ class user_profile extends condition_base {
                 case self::FIELD_DATA_TYPE_CHECKBOX:
                     $this->add_checkbox_field($mform, $group, $field, $shortname);
                     break;
+                case self::FIELD_DATA_TYPE_DATE:
+                    $this->add_date_field($mform, $group, $field, $shortname);
                 default:
                     throw new coding_exception('Invalid field type ' . $field->datatype);
             }
         }
 
-        $mform->addGroup($group, 'profilefieldgroup', get_string('profilefield', 'tool_dynamic_cohorts'), '', false);
-    }
-
-    /**
-     * Validate config form elements.
-     *
-     * @param array $data Data to validate.
-     * @return array
-     */
-    public function config_form_validate(array $data): array {
-        $errors = [];
-
-        $fields = $this->get_fields_info();
-        if (empty($data[static::get_form_field()]) || !isset($fields[$data[static::get_form_field()]])) {
-            $errors['profilefieldgroup'] = get_string('pleaseselectfield', 'tool_dynamic_cohorts');
-        }
-
-        $fieldvalue = $data[static::get_form_field()] . '_value';
-        $operator = $data[static::get_form_field()] . '_operator';
-        $datatype = $fields[$data[static::get_form_field()]]->datatype ?? '';
-
-        if (empty($data[$fieldvalue])) {
-            if ($datatype == 'text' && !in_array($data[$operator], [self::TEXT_IS_EMPTY, self::TEXT_IS_NOT_EMPTY])) {
-                $errors['profilefieldgroup'] = get_string('invalidfieldvalue', 'tool_dynamic_cohorts');
-            }
-        }
-
-        return $errors;
+        $mform->addGroup($group, 'fieldgroup', get_string('profilefield', 'tool_dynamic_cohorts'), '', false);
     }
 
     /**

@@ -53,7 +53,8 @@ class user_custom_profile extends user_profile {
      * @return array
      */
     protected function get_supported_custom_fields(): array {
-        return [self::FIELD_DATA_TYPE_TEXT, self::FIELD_DATA_TYPE_MENU, self::FIELD_DATA_TYPE_CHECKBOX];
+        return [self::FIELD_DATA_TYPE_TEXT, self::FIELD_DATA_TYPE_MENU,
+            self::FIELD_DATA_TYPE_CHECKBOX, self::FIELD_DATA_TYPE_DATETIME];
     }
 
     /**
@@ -87,6 +88,9 @@ class user_custom_profile extends user_profile {
                 case self::FIELD_DATA_TYPE_CHECKBOX:
                     $field->param1 = array_combine([0, 1], [get_string('no'), get_string('yes')]);
                     break;
+                case self::FIELD_DATA_TYPE_DATETIME:
+                    $field->paramtype = PARAM_INT;
+                    break;
                 default:
                     throw new coding_exception('Invalid field type ' . $field->datatype);
             }
@@ -119,16 +123,19 @@ class user_custom_profile extends user_profile {
                 case self::FIELD_DATA_TYPE_TEXT:
                     $this->add_text_field($mform, $group, $field, $shortname);
                     break;
-                case  self::FIELD_DATA_TYPE_MENU:
+                case self::FIELD_DATA_TYPE_MENU:
                     $this->add_menu_field($mform, $group, $field, $shortname);
                     break;
-                case  self::FIELD_DATA_TYPE_CHECKBOX:
+                case self::FIELD_DATA_TYPE_CHECKBOX:
                     $this->add_checkbox_field($mform, $group, $field, $shortname);
+                    break;
+                case self::FIELD_DATA_TYPE_DATETIME:
+                    $this->add_date_field($mform, $group, $field, $shortname);
                     break;
             }
         }
 
-        $mform->addGroup($group, 'profilefieldgroup', get_string('profilefield', 'tool_dynamic_cohorts'), '', false);
+        $mform->addGroup($group, 'fieldgroup', get_string('profilefield', 'tool_dynamic_cohorts'), '', false);
 
         $mform->addElement(
             'checkbox',
@@ -181,6 +188,9 @@ class user_custom_profile extends user_profile {
             case self::FIELD_DATA_TYPE_CHECKBOX:
             case self::FIELD_DATA_TYPE_MENU:
                 $result = $this->get_menu_sql($ud, 'data');
+                break;
+            case self::FIELD_DATA_TYPE_DATETIME:
+                $result = $this->get_date_sql($ud, 'data');
                 break;
         }
 

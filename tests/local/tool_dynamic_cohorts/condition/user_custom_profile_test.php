@@ -201,7 +201,7 @@ class user_custom_profile_test extends \advanced_testcase {
     }
 
     /**
-     * Test setting and getting config data.
+     * Test sql data generation.
      */
     public function test_get_sql_data() {
         global $DB;
@@ -211,16 +211,21 @@ class user_custom_profile_test extends \advanced_testcase {
         $fieldtext1 = $this->add_user_profile_field('field1', 'text');
         $fieldtext2 = $this->add_user_profile_field('field2', 'text', ['param1' => "Opt 1\nOpt 2\nOpt 3"]);
         $fieldcheckbox = $this->add_user_profile_field('field3', 'checkbox');
+        $fielddate = $this->add_user_profile_field('field4', 'datetime', ['param1' => 2000, 'param2' => 5000]);
+
+        $now = time();
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'user1']);
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldtext1->shortname => 'User 1 Field 1']);
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldtext2->shortname => 'Opt 1']);
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldcheckbox->shortname => '1']);
+        profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fielddate->shortname => $now - WEEKSECS]);
 
         $user2 = $this->getDataGenerator()->create_user(['username' => 'user2']);
         profile_save_data((object)['id' => $user2->id, 'profile_field_' . $fieldtext1->shortname => 'User 2 Field 1']);
         profile_save_data((object)['id' => $user2->id, 'profile_field_' . $fieldtext2->shortname => 'Opt 2']);
         profile_save_data((object)['id' => $user2->id, 'profile_field_' . $fieldcheckbox->shortname => '0']);
+        profile_save_data((object)['id' => $user2->id, 'profile_field_' . $fielddate->shortname => $now + WEEKSECS]);
 
         $totalusers = $DB->count_records('user');
 
@@ -283,6 +288,33 @@ class user_custom_profile_test extends \advanced_testcase {
         $result = $condition->get_sql();
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $this->assertCount(1, $DB->get_records_sql($sql, $result->get_params()));
+
+        $test = $DB->get_records('user_info_data');
+
+        $fieldname = 'profile_field_' . $fielddate->shortname;
+        $condition->set_config_data([
+            'profilefield' => $fieldname,
+            $fieldname . '_operator' => condition_base::DATE_IS_BEFORE,
+            $fieldname . '_value' => $now,
+            'include_missing_data' => 0,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount(1, $DB->get_records_sql($sql, $result->get_params()));
+
+        $fieldname = 'profile_field_' . $fielddate->shortname;
+        $condition->set_config_data([
+            'profilefield' => $fieldname,
+            $fieldname . '_operator' => condition_base::DATE_IS_AFTER,
+            $fieldname . '_value' => $now,
+            'include_missing_data' => 0,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount(1, $DB->get_records_sql($sql, $result->get_params()));
+
     }
 
     /**

@@ -85,7 +85,8 @@ class cohort_field extends condition_base {
      * @return array
      */
     protected function get_supported_custom_fields(): array {
-        return [self::FIELD_DATA_TYPE_TEXT, self::FIELD_DATA_TYPE_SELECT, self::FIELD_DATA_TYPE_CHECKBOX];
+        return [self::FIELD_DATA_TYPE_TEXT, self::FIELD_DATA_TYPE_SELECT,
+            self::FIELD_DATA_TYPE_CHECKBOX, self::FIELD_DATA_TYPE_DATE];
     }
 
     /**
@@ -154,6 +155,9 @@ class cohort_field extends condition_base {
                     case self::FIELD_DATA_TYPE_CHECKBOX:
                         $fields[$shortname]->param1 = array_combine([0, 1], [get_string('no'), get_string('yes')]);
                         break;
+                    case self::FIELD_DATA_TYPE_DATE:
+                        $fields[$shortname]->paramtype = PARAM_INT;
+                        break;
                     default:
                         throw new coding_exception('Invalid field type ' . $fields[$shortname]->datatype);
                 }
@@ -217,6 +221,9 @@ class cohort_field extends condition_base {
                 case self::FIELD_DATA_TYPE_CHECKBOX:
                     $this->add_checkbox_field($mform, $group, $field, $shortname);
                     break;
+                case self::FIELD_DATA_TYPE_DATE:
+                    $this->add_date_field($mform, $group, $field, $shortname);
+                    break;
                 default:
                     throw new coding_exception('Invalid field type ' . $field->datatype);
             }
@@ -242,33 +249,6 @@ class cohort_field extends condition_base {
             $mform->addElement($element);
             $mform->addHelpButton($fieldname, 'cf_include_missing_data', 'tool_dynamic_cohorts');
         }
-    }
-
-    /**
-     * Validate config form elements.
-     *
-     * @param array $data Data to validate.
-     * @return array
-     */
-    public function config_form_validate(array $data): array {
-        $errors = [];
-
-        $fields = $this->get_fields_info();
-        if (empty($data[static::get_form_field()]) || !isset($fields[$data[static::get_form_field()]])) {
-            $errors['fieldgroup'] = get_string('pleaseselectfield', 'tool_dynamic_cohorts');
-        }
-
-        $fieldvalue = $data[static::get_form_field()] . '_value';
-        $operator = $data[static::get_form_field()] . '_operator';
-        $datatype = $fields[$data[static::get_form_field()]]->datatype ?? '';
-
-        if (empty($data[$fieldvalue])) {
-            if ($datatype == 'text' && !in_array($data[$operator], [self::TEXT_IS_EMPTY, self::TEXT_IS_NOT_EMPTY])) {
-                $errors['fieldgroup'] = get_string('invalidfieldvalue', 'tool_dynamic_cohorts');
-            }
-        }
-
-        return $errors;
     }
 
     /**
@@ -404,6 +384,9 @@ class cohort_field extends condition_base {
                 case self::FIELD_DATA_TYPE_MENU:
                 case self::FIELD_DATA_TYPE_SELECT:
                     $fieldsqldata = $this->get_menu_sql($fieldstable, $dbcolumn);
+                    break;
+                case self::FIELD_DATA_TYPE_DATE:
+                    $fieldsqldata = $this->get_date_sql($fieldstable, $dbcolumn);
                     break;
                 default:
                     throw new coding_exception('Invalid field type ' . $datatype);
