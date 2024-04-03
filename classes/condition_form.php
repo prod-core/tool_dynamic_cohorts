@@ -61,7 +61,7 @@ class condition_form extends moodleform {
             throw new coding_exception('Condition class name is not set');
         }
 
-        $conditions = condition_manager::get_all_conditions();
+        $conditions = condition_manager::get_all_conditions(false);
         if (!array_key_exists($this->_customdata['classname'], $conditions)) {
             throw new moodle_exception('Condition is broken. Invalid condition class.');
         }
