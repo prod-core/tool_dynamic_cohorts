@@ -157,6 +157,12 @@ class course_completed_test extends \advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
 
+        $condition = condition_base::get_instance(0, (object)[
+            'classname' => '\tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\course_completed',
+        ]);
+
+        $this->assertFalse($condition->is_broken());
+
         // Invalid course.
         $condition = $this->get_condition([
             'courseid' => 7777,
@@ -257,5 +263,4 @@ class course_completed_test extends \advanced_testcase {
     public function test_get_events() {
         $this->assertEquals([], $this->get_condition()->get_events());
     }
-
 }

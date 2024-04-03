@@ -228,15 +228,17 @@ class course_completed extends condition_base {
     public function is_broken(): bool {
         global $DB;
 
-        // Check course exists.
-        if (!$course = $DB->get_record('course', ['id' => $this->get_courseid_value()])) {
-            return true;
-        }
+        if ($this->get_config_data()) {
+            // Check course exists.
+            if (!$course = $DB->get_record('course', ['id' => $this->get_courseid_value()])) {
+                return true;
+            }
 
-        // Check completion is enabled for a course.
-        $completion = new completion_info($course);
-        if (!$completion->is_enabled()) {
-            return true;
+            // Check completion is enabled for a course.
+            $completion = new completion_info($course);
+            if (!$completion->is_enabled()) {
+                return true;
+            }
         }
 
         return false;
