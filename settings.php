@@ -24,11 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $ADMIN->add('accounts', new admin_category('tool_dynamic_cohorts', get_string('pluginname', 'tool_dynamic_cohorts')));
-    $ADMIN->add('tool_dynamic_cohorts', new admin_externalpage(
-        'tool_dynamic_cohorts_rules',
-        get_string('managerules', 'tool_dynamic_cohorts'),
-        new moodle_url('/admin/tool/dynamic_cohorts/index.php')
-    ));
-}
+$ADMIN->add('accounts', new admin_category('tool_dynamic_cohorts', get_string('pluginname', 'tool_dynamic_cohorts')));
+$ADMIN->add('tool_dynamic_cohorts', new admin_externalpage(
+    'tool_dynamic_cohorts_rules',
+    get_string('managerules', 'tool_dynamic_cohorts'),
+    new moodle_url('/admin/tool/dynamic_cohorts/index.php'),
+    'tool/dynamic_cohorts:manage'
+));
