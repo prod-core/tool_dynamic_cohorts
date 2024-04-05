@@ -136,6 +136,6 @@ $string['rule_entity.bulkprocessing'] = 'Bulk processing';
 $string['rule_entity.status'] = 'Status';
 $string['usercreated'] = 'User was created';
 $string['usercreatedin'] = 'A user was created in the last {$a}';
-$string['usercreatedtime']= 'A user was created {$a->operator} {$a->time}';
+$string['usercreatedtime'] = 'A user was created {$a->operator} {$a->time}';
 $string['usersforrule'] = 'Users matching rule "{$a->rule}" for cohort "{$a->cohort}"';
 $string['userlastlogin'] = 'User\'s last login';
