@@ -19,15 +19,15 @@ namespace tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition;
 use tool_dynamic_cohorts\condition_base;
 
 /**
- * Unit tests for user_last_login condition class.
+ * Unit tests for user_created condition class.
  *
  * @package     tool_dynamic_cohorts
  * @copyright   2024 Catalyst IT
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_last_login
+ * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_created
  */
-class user_last_login_test extends \advanced_testcase {
+class user_created_test extends \advanced_testcase {
 
     /**
      * Get condition instance for testing.
@@ -37,7 +37,7 @@ class user_last_login_test extends \advanced_testcase {
      */
     protected function get_condition(array $configdata = []): condition_base {
         $condition = condition_base::get_instance(0, (object)[
-            'classname' => '\tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_last_login',
+            'classname' => '\tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_created',
         ]);
         $condition->set_config_data($configdata);
 
@@ -94,24 +94,12 @@ class user_last_login_test extends \advanced_testcase {
         $now = time();
 
         $condition = $this->get_condition([
-            'operator' => user_last_login::OPERATOR_EVER,
-            'time' => $now,
-        ]);
-        $this->assertSame('A user has logged in at least once', $condition->get_config_description());
-
-        $condition = $this->get_condition([
-            'operator' => user_last_login::OPERATOR_NEVER,
-            'time' => $now,
-        ]);
-        $this->assertSame('A user has never logged in', $condition->get_config_description());
-
-        $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_IN_LAST,
             'time' => $now,
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user has logged in in the last 1 weeks', $condition->get_config_description());
+        $this->assertSame('A user was created in the last 1 weeks', $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_BEFORE,
@@ -119,7 +107,7 @@ class user_last_login_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user logged in before ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('A user was created before ' . userdate($now), $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_AFTER,
@@ -127,7 +115,7 @@ class user_last_login_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user logged in after ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('A user was created after ' . userdate($now), $condition->get_config_description());
     }
 
     /**
@@ -135,7 +123,7 @@ class user_last_login_test extends \advanced_testcase {
      */
     public function test_is_broken() {
         $condition = condition_base::get_instance(0, (object)[
-            'classname' => '\tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_last_login',
+            'classname' => '\tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_created',
         ]);
         $this->assertFalse($condition->is_broken());
 
@@ -213,35 +201,10 @@ class user_last_login_test extends \advanced_testcase {
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $totalusers = $DB->count_records('user');
-        $this->assertTrue($totalusers > 2);
-
-        // No one logged in so far. Should get all users.
-        $condition = $this->get_condition([
-            'operator' => user_last_login::OPERATOR_NEVER,
-        ]);
-        $result = $condition->get_sql();
-        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
-        $this->assertCount($totalusers, $DB->get_records_sql($sql, $result->get_params()));
-
-        // No one logged in so far. Should get no users.
-        $condition = $this->get_condition([
-            'operator' => user_last_login::OPERATOR_EVER,
-        ]);
-        $result = $condition->get_sql();
-        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
-        $this->assertCount(0, $DB->get_records_sql($sql, $result->get_params()));
-
-        // Emulate login for user 1 a week ago.
-        $DB->set_field('user', 'lastaccess', $now - WEEKSECS, ['id' => $user1->id]);
-        $result = $condition->get_sql();
-        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
-        $actual = $DB->get_records_sql($sql, $result->get_params());
-        $this->assertCount(1, $actual);
-        $this->assertSame($user1->id, reset($actual)->id);
-
-        // Emulate login for user 2 now.
-        $DB->set_field('user', 'lastaccess', $now, ['id' => $user2->id]);
+        // Emulate creating user 1 a week ago.
+        $DB->set_field('user', 'timecreated', $now - WEEKSECS, ['id' => $user1->id]);
+        // Emulate creating user 2 now.
+        $DB->set_field('user', 'timecreated', $now, ['id' => $user2->id]);
 
         // In the last day. Should be user 2.
         $condition = $this->get_condition([
@@ -294,7 +257,7 @@ class user_last_login_test extends \advanced_testcase {
      */
     public function test_get_events() {
         $this->assertEquals([
-            '\core\event\user_loggedin',
+            '\core\event\user_created',
         ], $this->get_condition()->get_events());
     }
 }

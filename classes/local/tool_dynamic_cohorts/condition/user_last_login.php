@@ -78,6 +78,15 @@ class user_last_login extends condition_base {
     }
 
     /**
+     * Gets the operator form label.
+     *
+     * @return string The operator form label.
+     */
+    protected function get_operator_form_label(): string {
+        return get_string('userlastlogin', 'tool_dynamic_cohorts');
+    }
+
+    /**
      * Add config form elements.
      *
      * @param \MoodleQuickForm $mform
@@ -86,7 +95,7 @@ class user_last_login extends condition_base {
         $mform->addElement(
             'select',
             'operator',
-            get_string('userlastlogin', 'tool_dynamic_cohorts'),
+            $this->get_operator_form_label(),
             $this->get_operators()
         );
         $mform->setType('operator', PARAM_INT);
@@ -103,13 +112,7 @@ class user_last_login extends condition_base {
             'select',
             'period_type',
             get_string('userlastlogin', 'tool_dynamic_cohorts'),
-            [
-                'hour' => get_string('numhours', 'moodle', ''),
-                'day' => get_string('numdays', 'moodle', ''),
-                'week' => get_string('numweeks', 'moodle', ''),
-                'month' => get_string('nummonths', 'moodle', ''),
-                'year' => get_string('numyears', 'moodle', ''),
-            ]
+            $this->get_period_options()
         );
 
         $mform->addElement('group', 'period', '', $elements, '', false);
@@ -176,6 +179,21 @@ class user_last_login extends condition_base {
      */
     protected function get_period(): string {
         return $this->get_period_value_value() . ' ' . $this->get_period_type_value();
+    }
+
+    /**
+     * Gets configured time value.
+     *
+     * @return string[]
+     */
+    protected function get_period_options(): array {
+        return [
+            'hours' => get_string('numhours', 'moodle', ''),
+            'days' => get_string('numdays', 'moodle', ''),
+            'weeks' => get_string('numweeks', 'moodle', ''),
+            'months' => get_string('nummonths', 'moodle', ''),
+            'years' => get_string('numyears', 'moodle', ''),
+        ];
     }
 
     /**
