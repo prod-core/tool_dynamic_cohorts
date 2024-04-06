@@ -51,6 +51,7 @@ class user_role_test extends \advanced_testcase {
      */
     public function test_retrieving_configdata() {
         $formdata = (object)[
+            'operator' => 1,
             'roleid' => 1,
             'contextlevel' => 3,
             'courseid' => 1,
@@ -61,6 +62,7 @@ class user_role_test extends \advanced_testcase {
 
         $actual = $this->get_condition()::retrieve_config_data($formdata);
         $expected = [
+            'operator' => 1,
             'roleid' => 1,
             'contextlevel' => 3,
             'courseid' => 1,
@@ -75,6 +77,7 @@ class user_role_test extends \advanced_testcase {
      */
     public function test_set_and_get_configdata() {
         $condition = $this->get_condition([
+            'operator' => 1,
             'roleid' => 1,
             'contextlevel' => 3,
             'courseid' => 1,
@@ -84,6 +87,7 @@ class user_role_test extends \advanced_testcase {
 
         $this->assertEquals(
             [
+                'operator' => 1,
                 'roleid' => 1,
                 'contextlevel' => 3,
                 'courseid' => 1,
@@ -106,6 +110,7 @@ class user_role_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
 
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $roleid,
             'contextlevel' => CONTEXT_SYSTEM,
             'courseid' => $course->id,
@@ -114,7 +119,50 @@ class user_role_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has ' . $roles[$roleid]->name . ' role in system context',
+            'Users who have role "' . $roles[$roleid]->name . '" in system context',
+            $condition->get_config_description(),
+        );
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $roleid,
+            'contextlevel' => CONTEXT_SYSTEM,
+            'courseid' => $course->id,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+
+        $this->assertSame(
+            'Users who do not have role "' . $roles[$roleid]->name . '" in system context',
+            $condition->get_config_description(),
+        );
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $roleid,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course->id,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+
+        $this->assertSame(
+            'Users who have role "' . $roles[$roleid]->name . '" in course ' . $course->fullname . ' (id ' . $course->id . ')',
+            $condition->get_config_description(),
+        );
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $roleid,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course->id,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+
+        $this->assertSame(
+            'Users who do not have role "' . $roles[$roleid]->name . '" in course ' . $course->fullname
+            . ' (id ' . $course->id . ')',
             $condition->get_config_description(),
         );
 
@@ -127,11 +175,12 @@ class user_role_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has ' . $roles[$roleid]->name . ' role in course ' . $course->fullname . ' (id ' . $course->id . ')',
+            'Users who have role "' . $roles[$roleid]->name . '" in course ' . $course->fullname . ' (id ' . $course->id . ')',
             $condition->get_config_description(),
         );
 
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $roleid,
             'contextlevel' => CONTEXT_COURSECAT,
             'courseid' => $course->id,
@@ -140,11 +189,27 @@ class user_role_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has ' . $roles[$roleid]->name . ' role in category ' . $category->name . ' (id ' . $category->id . ') ',
+            'Users who have role "' . $roles[$roleid]->name . '" in category ' . $category->name . ' (id ' . $category->id . ') ',
             $condition->get_config_description(),
         );
 
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $roleid,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'courseid' => $course->id,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+
+        $this->assertSame(
+            'Users who do not have role "' . $roles[$roleid]->name . '" in category ' . $category->name
+            . ' (id ' . $category->id . ') ',
+            $condition->get_config_description(),
+        );
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $roleid,
             'contextlevel' => CONTEXT_COURSECAT,
             'courseid' => $course->id,
@@ -153,8 +218,24 @@ class user_role_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has ' . $roles[$roleid]->name . ' role in category ' . $category->name . ' (id ' . $category->id . ') ' .
-            'including children (categories and courses)',
+            'Users who have role "' . $roles[$roleid]->name . '" in category ' . $category->name . ' (id ' . $category->id . ') '
+            . 'including children (categories and courses)',
+            $condition->get_config_description(),
+        );
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $roleid,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'courseid' => $course->id,
+            'categoryid' => $category->id,
+            'includechildren' => 1,
+        ]);
+
+        $this->assertSame(
+            'Users who do not have role "' . $roles[$roleid]->name . '" in category ' . $category->name
+            . ' (id ' . $category->id . ') '
+            . 'including children (categories and courses)',
             $condition->get_config_description(),
         );
     }
@@ -238,9 +319,9 @@ class user_role_test extends \advanced_testcase {
     }
 
     /**
-     * Test getting correct SQL.
+     * Test getting correct SQL when operator "have role".
      */
-    public function test_get_sql_data() {
+    public function test_get_sql_data_operator_have_role() {
         global $DB;
 
         $this->resetAfterTest();
@@ -267,6 +348,7 @@ class user_role_test extends \advanced_testcase {
 
         // Manager role in system context. Should give us manager.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $managerrole->id,
             'contextlevel' => CONTEXT_SYSTEM,
             'includechildren' => 1,
@@ -279,6 +361,7 @@ class user_role_test extends \advanced_testcase {
 
         // Teacher role in system context. Should give us nothing.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $teacherrole->id,
             'contextlevel' => CONTEXT_SYSTEM,
             'includechildren' => 1,
@@ -290,6 +373,7 @@ class user_role_test extends \advanced_testcase {
 
         // Manager role in category context. Should give us manager.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $managerrole->id,
             'contextlevel' => CONTEXT_COURSECAT,
             'categoryid' => $category->id,
@@ -303,6 +387,7 @@ class user_role_test extends \advanced_testcase {
 
         // Teacher role in category context without children. Should give us $catteacher.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $teacherrole->id,
             'contextlevel' => CONTEXT_COURSECAT,
             'categoryid' => $category->id,
@@ -316,6 +401,7 @@ class user_role_test extends \advanced_testcase {
 
         // Teacher role in category context with children. Should give us $catteacher and $courseteacher.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $teacherrole->id,
             'contextlevel' => CONTEXT_COURSECAT,
             'categoryid' => $category->id,
@@ -330,6 +416,7 @@ class user_role_test extends \advanced_testcase {
 
         // Teacher role in course 1. Should give us $catteacher and $courseteacher.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $teacherrole->id,
             'contextlevel' => CONTEXT_COURSE,
             'courseid' => $course1->id,
@@ -343,6 +430,7 @@ class user_role_test extends \advanced_testcase {
 
         // Teacher role in course 2. Should give us only $catteacher.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $teacherrole->id,
             'contextlevel' => CONTEXT_COURSE,
             'courseid' => $course2->id,
@@ -355,6 +443,7 @@ class user_role_test extends \advanced_testcase {
 
         // Student role in course 1. Should give us $student1 and $student2.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $studentrole->id,
             'contextlevel' => CONTEXT_COURSE,
             'courseid' => $course1->id,
@@ -368,6 +457,7 @@ class user_role_test extends \advanced_testcase {
 
         // Student role in course 2. Should give us nothing.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $studentrole->id,
             'contextlevel' => CONTEXT_COURSE,
             'courseid' => $course2->id,
@@ -379,6 +469,7 @@ class user_role_test extends \advanced_testcase {
 
         // Student role in category context with children. Should give us $student1 and $student2.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $studentrole->id,
             'contextlevel' => CONTEXT_COURSECAT,
             'categoryid' => $category->id,
@@ -393,6 +484,7 @@ class user_role_test extends \advanced_testcase {
 
         // Student role in category context without children. Should give us nothing.
         $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
             'roleid' => $studentrole->id,
             'contextlevel' => CONTEXT_COURSECAT,
             'categoryid' => $category->id,
@@ -402,6 +494,187 @@ class user_role_test extends \advanced_testcase {
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $actual = $DB->get_records_sql($sql, $result->get_params());
         $this->assertCount(0, $actual);
+    }
+
+    /**
+     * Test getting correct SQL when operator "have role".
+     */
+    public function test_get_sql_data_operator_do_not_have_role() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $category = $this->getDataGenerator()->create_category();
+        $course1 = $this->getDataGenerator()->create_course(['category' => $category->id]);
+        $course2 = $this->getDataGenerator()->create_course(['category' => $category->id]);
+
+        $managerrole = $DB->get_record('role', ['shortname' => 'manager']);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $manager = $this->getDataGenerator()->create_user();
+        $catteacher = $this->getDataGenerator()->create_user();
+        $courseteacher = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+
+        $this->getDataGenerator()->role_assign($managerrole->id, $manager->id, context_system::instance()->id);
+        $this->getDataGenerator()->role_assign($teacherrole->id, $catteacher->id, context_coursecat::instance($category->id)->id);
+        $this->getDataGenerator()->enrol_user($courseteacher->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id, $studentrole->id);
+
+        $totalusers = $DB->count_records('user');
+        $this->assertTrue($totalusers > 5);
+
+        // Manager role in system context. Should give us everyone except manager.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $managerrole->id,
+            'contextlevel' => CONTEXT_SYSTEM,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 1, $actual);
+        $this->assertArrayNotHasKey($manager->id, $actual);
+
+        // Teacher role in system context. Should give us everyone.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_SYSTEM,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers, $actual);
+
+        // Manager role in category context. Should give us everyone except manager.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $managerrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 1, $actual);
+        $this->assertArrayNotHasKey($manager->id, $actual);
+
+        // Teacher role in category context without children. Should give us everyone except $catteacher.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 1, $actual);
+        $this->assertArrayNotHasKey($catteacher->id, $actual);
+
+        // Teacher role in category context with children. Should give us everyone except $catteacher and $courseteacher.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $category->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 2, $actual);
+        $this->assertArrayNotHasKey($catteacher->id, $actual);
+        $this->assertArrayNotHasKey($courseteacher->id, $actual);
+
+        // Teacher role in course 1. Should give us everyone except $catteacher and $courseteacher.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course1->id,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 2, $actual);
+        $this->assertArrayNotHasKey($catteacher->id, $actual);
+        $this->assertArrayNotHasKey($courseteacher->id, $actual);
+
+        // Teacher role in course 2. Should give us everyone except $catteacher.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course2->id,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 1, $actual);
+        $this->assertArrayNotHasKey($catteacher->id, $actual);
+
+        // Student role in course 1. Should give us everyone except $student1 and $student2.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $studentrole->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course1->id,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 2, $actual);
+        $this->assertArrayNotHasKey($student1->id, $actual);
+        $this->assertArrayNotHasKey($student2->id, $actual);
+
+        // Student role in course 2. Should give us everyone.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $studentrole->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $course2->id,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers, $actual);
+
+        // Student role in category context with children. Should give us everyone except $student1 and $student2.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $studentrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $category->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers - 2, $actual);
+        $this->assertArrayNotHasKey($student1->id, $actual);
+        $this->assertArrayNotHasKey($student2->id, $actual);
+
+        // Student role in category context without children. Should give us everyone.
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $studentrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $category->id,
+            'includechildren' => 0,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount($totalusers, $actual);
     }
 
     /**

@@ -33,6 +33,16 @@ use context_coursecat;
 class user_role extends condition_base {
 
     /**
+     * Operator for user who have role.
+     */
+    public const OPERATOR_HAVE_ROLE = 0;
+
+    /**
+     * Operator for user who do not have role.
+     */
+    public const OPERATOR_DO_NOT_HAVE_ROLE = 1;
+
+    /**
      * Condition name.
      *
      * @return string
@@ -59,11 +69,31 @@ class user_role extends condition_base {
     }
 
     /**
+     * Gets a list of operators.
+     *
+     * @return array A list of operators.
+     */
+    protected function get_operators(): array {
+        return [
+            self::OPERATOR_HAVE_ROLE => get_string('haverole', 'tool_dynamic_cohorts'),
+            self::OPERATOR_DO_NOT_HAVE_ROLE => get_string('donothaverole', 'tool_dynamic_cohorts'),
+        ];
+    }
+
+    /**
      * Add config form elements.
      *
      * @param \MoodleQuickForm $mform
      */
     public function config_form_add(\MoodleQuickForm $mform): void {
+        // Operator.
+        $mform->addElement(
+            'select',
+            'operator',
+            get_string('operator', 'tool_dynamic_cohorts'),
+            $this->get_operators()
+        );
+
         // Role field.
         $mform->addElement('select', 'roleid', get_string('role'), $this->get_all_roles());
 
@@ -112,6 +142,15 @@ class user_role extends condition_base {
         }
 
         return $errors;
+    }
+
+    /**
+     * Gets operator.
+     *
+     * @return int
+     */
+    protected function get_operator_value(): int {
+        return $this->get_config_data()['operator'] ?? self::OPERATOR_HAVE_ROLE;
     }
 
     /**
@@ -171,7 +210,10 @@ class user_role extends condition_base {
 
         switch ($this->get_contextlevel_value()) {
             case CONTEXT_SYSTEM:
-                return get_string('condition:user_role_description_system', 'tool_dynamic_cohorts', $rolename);
+                return get_string('condition:user_role_description_system', 'tool_dynamic_cohorts', (object)[
+                    'role' => $rolename,
+                    'operator' => $this->get_operators()[$this->get_operator_value()],
+                ]);
 
             case CONTEXT_COURSECAT:
                 $children = !empty($this->get_includechildren_value()) ? get_string('includechildren', 'tool_dynamic_cohorts') : '';
@@ -179,8 +221,10 @@ class user_role extends condition_base {
 
                 return get_string('condition:user_role_description_category', 'tool_dynamic_cohorts', (object) [
                     'role' => $rolename,
+                    'operator' => $this->get_operators()[$this->get_operator_value()],
                     'categoryname' => $categoryname,
                     'categoryid' => $this->get_categoryid_value(),
+
                 ]) . ' ' . $children;
 
             case CONTEXT_COURSE:
@@ -189,6 +233,7 @@ class user_role extends condition_base {
 
                 return get_string('condition:user_role_description_course', 'tool_dynamic_cohorts', (object) [
                     'role' => $rolename,
+                    'operator' => $this->get_operators()[$this->get_operator_value()],
                     'coursename' => $coursename,
                     'courseid' => $this->get_courseid_value(),
                 ]);
@@ -242,8 +287,7 @@ class user_role extends condition_base {
             $params[$roleidparam] = $roleid;
 
             $ratable = condition_sql::generate_table_alias();
-            $join = "JOIN {role_assignments} $ratable ON ($ratable.userid = u.id)";
-            $where = "$ratable.roleid = :$roleidparam";
+            $innerwhere = "$ratable.roleid = :$roleidparam";
 
             switch ($this->get_contextlevel_value()) {
                 case CONTEXT_SYSTEM:
@@ -251,7 +295,7 @@ class user_role extends condition_base {
                     $contextid = $context->id;
                     $contextidparam = condition_sql::generate_param_alias();
                     $params[$contextidparam] = $contextid;
-                    $where .= " AND $ratable.contextid = :$contextidparam";
+                    $innerwhere .= " AND $ratable.contextid = :$contextidparam";
 
                     break;
                 case CONTEXT_COURSECAT:
@@ -273,9 +317,9 @@ class user_role extends condition_base {
                             condition_sql::generate_param_alias()
                         );
                         $params = array_merge($params, $childcparams);
-                        $where .= " AND ( $ratable.contextid $parentcontexsql OR  $ratable.contextid $childcontextsql ) ";
+                        $innerwhere .= " AND ( $ratable.contextid $parentcontexsql OR  $ratable.contextid $childcontextsql ) ";
                     } else {
-                        $where .= " AND $ratable.contextid $parentcontexsql ";
+                        $innerwhere .= " AND $ratable.contextid $parentcontexsql ";
                     }
 
                     break;
@@ -290,10 +334,20 @@ class user_role extends condition_base {
                     );
 
                     $params = array_merge($params, $cparams);
-                    $where .= " AND $ratable.contextid $contextsql";
+                    $innerwhere .= " AND $ratable.contextid $contextsql";
 
                     break;
             }
+
+            $outertable = condition_sql::generate_table_alias();
+
+            $join = "LEFT JOIN (SELECT {$ratable}.userid
+                          FROM {role_assignments} $ratable
+                         WHERE $innerwhere) {$outertable}
+                      ON u.id = {$outertable}.userid";
+
+            $haverole = $this->get_operator_value() == self::OPERATOR_HAVE_ROLE;
+            $where = $haverole ? " $outertable.userid is NOT NULL" : " $outertable.userid is NULL";
 
             $sql = new condition_sql($join, $where, $params);
         }

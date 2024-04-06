@@ -63,7 +63,7 @@ Conditions are simple predicates which assert something about a user in the syst
 * User created time (time since a user was created).
 * User standard profile fields (e.g. first name, last name, username, auth method and etc).
 * User custom profile fields (text and menu types are supported).
-* User role (if a user is assigned to a role in a context)
+* User role (if a user has a role in a given context)
 
 ## Rules
 
