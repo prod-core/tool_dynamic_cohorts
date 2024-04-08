@@ -55,7 +55,7 @@ class provider implements \core_privacy\local\metadata\provider,
         $collection->add_database_table(
             'tool_dynamic_cohorts_c',
             [
-                'ruleid' => 'privacy:metadata:tool_dynamic_cohorts:ruleid',
+                'ruleid' => 'privacy:metadata:tool_dynamic_cohorts_c:ruleid',
                 'usermodified' => 'privacy:metadata:tool_dynamic_cohorts:usermodified',
 
             ],
