@@ -142,6 +142,11 @@ Task processing is orchestrated by a simple mechanism:
    a) Iterate over all users, adding them to the cohort one at a time (via the cohort API)
    b) If bulk processing is enabled, users will be inserted directly in to the DB in batches, bypassing the core API
 
+
+## Warm thanks ##
+
+Plugin funded by Murdoch University, Perth, Western Australia (https://www.murdoch.edu.au/) 
+
 ## License ##
 
 2024 Catalyst IT
