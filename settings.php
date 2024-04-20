@@ -25,6 +25,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 $ADMIN->add('accounts', new admin_category('tool_dynamic_cohorts', get_string('pluginname', 'tool_dynamic_cohorts')));
+
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('tool_dynamic_cohorts_settings', new lang_string('settings'));
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_dynamic_cohorts/releasemembers',
+        new lang_string('settings:releasemembers', 'tool_dynamic_cohorts'),
+        new lang_string('settings:releasemembers_desc', 'tool_dynamic_cohorts'),
+        0
+    ));
+    $ADMIN->add('tool_dynamic_cohorts', $settings);
+}
+
 $ADMIN->add('tool_dynamic_cohorts', new admin_externalpage(
     'tool_dynamic_cohorts_rules',
     get_string('managerules', 'tool_dynamic_cohorts'),

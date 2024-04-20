@@ -77,12 +77,19 @@ class cohort_manager {
      * @param int $cohortid Cohort ID.
      */
     public static function unmanage_cohort(int $cohortid): void {
+        global $DB;
+
         $cohorts = self::get_cohorts();
 
         if (!empty($cohorts[$cohortid])) {
             $cohort = $cohorts[$cohortid];
             $cohort->component = '';
             cohort_update_cohort($cohort);
+
+            // Brutally delete members if configured to do so. No cohort_member_removed events will be triggered.
+            if (get_config('tool_dynamic_cohorts', 'releasemembers')) {
+                $DB->delete_records('cohort_members', ['cohortid' => $cohortid]);
+            }
         }
     }
 }
