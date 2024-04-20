@@ -90,14 +90,14 @@ class user_profile_test extends \advanced_testcase {
      */
     public static function config_description_data_provider(): array {
         return [
-            [condition_base::TEXT_CONTAINS, 'First name contains 123'],
-            [condition_base::TEXT_DOES_NOT_CONTAIN, 'First name doesn\'t contain 123'],
-            [condition_base::TEXT_IS_EQUAL_TO, 'First name is equal to 123'],
-            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'First name isn\'t equal to 123'],
-            [condition_base::TEXT_STARTS_WITH, 'First name starts with 123'],
-            [condition_base::TEXT_ENDS_WITH, 'First name ends with 123'],
-            [condition_base::TEXT_IS_EMPTY, 'First name is empty '],
-            [condition_base::TEXT_IS_NOT_EMPTY, 'First name is not empty '],
+            [condition_base::TEXT_CONTAINS, 'Users with First name contains 123'],
+            [condition_base::TEXT_DOES_NOT_CONTAIN, 'Users with First name doesn\'t contain 123'],
+            [condition_base::TEXT_IS_EQUAL_TO, 'Users with First name is equal to 123'],
+            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'Users with First name isn\'t equal to 123'],
+            [condition_base::TEXT_STARTS_WITH, 'Users with First name starts with 123'],
+            [condition_base::TEXT_ENDS_WITH, 'Users with First name ends with 123'],
+            [condition_base::TEXT_IS_EMPTY, 'Users with First name is empty '],
+            [condition_base::TEXT_IS_NOT_EMPTY, 'Users with First name is not empty '],
         ];
     }
 
@@ -128,7 +128,7 @@ class user_profile_test extends \advanced_testcase {
             'auth_value' => 'manual',
         ]);
 
-        $this->assertSame('Authentication method is equal to Manual accounts', $instance->get_config_description());
+        $this->assertSame('Users with Authentication method is equal to Manual accounts', $instance->get_config_description());
     }
 
     /**

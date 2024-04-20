@@ -152,7 +152,10 @@ class rule_conditions_test extends externallib_advanced_testcase {
             '{"profilefield":"username","username_operator":3,"username_value":"user1username"}',
             $conditions[$condition2->get_record()->get('id')]['configdata']
         );
-        $this->assertSame('Username is equal to user1username', $conditions[$condition2->get_record()->get('id')]['description']);
+        $this->assertSame(
+            'Users with Username is equal to user1username',
+            $conditions[$condition2->get_record()->get('id')]['description']
+        );
         $this->assertSame('User standard profile field', $conditions[$condition2->get_record()->get('id')]['name']);
 
         $this->assertSame($condition3->get('id'), $conditions[$condition3->get('id')]['id']);
@@ -172,7 +175,10 @@ class rule_conditions_test extends externallib_advanced_testcase {
             '{"profilefield":"username","username_operator":3,"username_value":""}',
             $conditions[$condition4->get_record()->get('id')]['configdata']
         );
-        $this->assertSame('Username is equal to user1username', $conditions[$condition2->get_record()->get('id')]['description']);
+        $this->assertSame(
+            'Users with Username is equal to user1username',
+            $conditions[$condition2->get_record()->get('id')]['description']
+        );
         $this->assertSame('User standard profile field', $conditions[$condition2->get_record()->get('id')]['name']);
 
         $this->assertSame(true, $conditions[$condition1->get_record()->get('id')]['broken']);

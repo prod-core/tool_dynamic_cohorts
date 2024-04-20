@@ -97,13 +97,13 @@ class user_last_login_test extends \advanced_testcase {
             'operator' => user_last_login::OPERATOR_EVER,
             'time' => $now,
         ]);
-        $this->assertSame('A user has logged in at least once', $condition->get_config_description());
+        $this->assertSame('Users who have logged in at least once', $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_NEVER,
             'time' => $now,
         ]);
-        $this->assertSame('A user has never logged in', $condition->get_config_description());
+        $this->assertSame('Users who have never logged in', $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_IN_LAST,
@@ -111,7 +111,7 @@ class user_last_login_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user has logged in in the last 1 weeks', $condition->get_config_description());
+        $this->assertSame('Users who have logged in in the last 1 weeks', $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_BEFORE,
@@ -119,7 +119,7 @@ class user_last_login_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user logged in before ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('Users who logged in before ' . userdate($now), $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_AFTER,
@@ -127,7 +127,7 @@ class user_last_login_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user logged in after ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('Users who logged in after ' . userdate($now), $condition->get_config_description());
     }
 
     /**
