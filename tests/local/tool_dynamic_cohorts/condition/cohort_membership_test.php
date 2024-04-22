@@ -102,14 +102,14 @@ class cohort_membership_test extends \advanced_testcase {
             'cohort_membership_operator' => cohort_membership::OPERATOR_IS_MEMBER_OF,
             'cohort_membership_value' => [$cohort1->id],
         ]);
-        $this->assertSame('A user is member of ' . $cohort1->name, $condition->get_config_description());
+        $this->assertSame('Users who are members of ' . $cohort1->name, $condition->get_config_description());
 
         $condition = $this->get_condition([
             'cohort_membership_operator' => cohort_membership::OPERATOR_IS_NOT_MEMBER_OF,
             'cohort_membership_value' => [$cohort1->id, $cohort2->id],
         ]);
         $this->assertSame(
-            'A user is not member of ' . $cohort1->name . ' OR ' . $cohort2->name,
+            'Users who are not members of ' . $cohort1->name . ' OR ' . $cohort2->name,
             $condition->get_config_description()
         );
 
@@ -118,7 +118,7 @@ class cohort_membership_test extends \advanced_testcase {
             'cohort_membership_value' => [$cohort1->id, $cohort2->id, 777],
         ]);
         $this->assertSame(
-            'A user is member of ' . $cohort1->name . ' OR ' . $cohort2->name . ' OR ' . 777,
+            'Users who are members of ' . $cohort1->name . ' OR ' . $cohort2->name . ' OR ' . 777,
             $condition->get_config_description()
         );
     }
@@ -218,7 +218,7 @@ class cohort_membership_test extends \advanced_testcase {
         $this->assertSame(
             get_string('condition:cohort_membership_broken_description', 'tool_dynamic_cohorts')
             . '<br />'
-            . "A user is member of {$cohort1->name} OR {$cohort2->name}",
+            . "Users who are members of {$cohort1->name} OR {$cohort2->name}",
             $condition->get_broken_description()
         );
     }

@@ -91,14 +91,17 @@ class cohort_field_test extends \advanced_testcase {
      */
     public static function config_description_data_provider(): array {
         return [
-            [condition_base::TEXT_CONTAINS, 'A user is not member of cohorts with field \'Theme\' contains 123'],
-            [condition_base::TEXT_DOES_NOT_CONTAIN, 'A user is not member of cohorts with field \'Theme\' doesn\'t contain 123'],
-            [condition_base::TEXT_IS_EQUAL_TO, 'A user is not member of cohorts with field \'Theme\' is equal to 123'],
-            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'A user is not member of cohorts with field \'Theme\' isn\'t equal to 123'],
-            [condition_base::TEXT_STARTS_WITH, 'A user is not member of cohorts with field \'Theme\' starts with 123'],
-            [condition_base::TEXT_ENDS_WITH, 'A user is not member of cohorts with field \'Theme\' ends with 123'],
-            [condition_base::TEXT_IS_EMPTY, 'A user is not member of cohorts with field \'Theme\' is empty '],
-            [condition_base::TEXT_IS_NOT_EMPTY, 'A user is not member of cohorts with field \'Theme\' is not empty '],
+            [condition_base::TEXT_CONTAINS, 'Users who are not members of cohorts with field \'Theme\' contains 123'],
+            [
+                condition_base::TEXT_DOES_NOT_CONTAIN,
+                'Users who are not members of cohorts with field \'Theme\' doesn\'t contain 123',
+            ],
+            [condition_base::TEXT_IS_EQUAL_TO, 'Users who are not members of cohorts with field \'Theme\' is equal to 123'],
+            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'Users who are not members of cohorts with field \'Theme\' isn\'t equal to 123'],
+            [condition_base::TEXT_STARTS_WITH, 'Users who are not members of cohorts with field \'Theme\' starts with 123'],
+            [condition_base::TEXT_ENDS_WITH, 'Users who are not members of cohorts with field \'Theme\' ends with 123'],
+            [condition_base::TEXT_IS_EMPTY, 'Users who are not members of cohorts with field \'Theme\' is empty '],
+            [condition_base::TEXT_IS_NOT_EMPTY, 'Users who are not members of cohorts with field \'Theme\' is not empty '],
         ];
     }
 
@@ -137,7 +140,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Context\' is equal to ' . $coursecategory->name,
+            'Users who are members of cohorts with field \'Context\' is equal to ' . $coursecategory->name,
             $condition->get_config_description()
         );
     }
@@ -316,7 +319,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Custom field\' is equal to Test value',
+            'Users who are members of cohorts with field \'Custom field\' is equal to Test value',
             $condition->get_config_description()
         );
 
@@ -330,7 +333,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Custom field\' is equal to Yes',
+            'Users who are members of cohorts with field \'Custom field\' is equal to Yes',
             $condition->get_config_description()
         );
 
@@ -342,7 +345,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Custom field\' is equal to No',
+            'Users who are members of cohorts with field \'Custom field\' is equal to No',
             $condition->get_config_description()
         );
 
@@ -357,7 +360,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Custom field\' is after ' . userdate($now),
+            'Users who are members of cohorts with field \'Custom field\' is after ' . userdate($now),
             $condition->get_config_description()
         );
 
@@ -369,7 +372,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user is member of cohorts with field \'Custom field\' is before ' . userdate($now),
+            'Users who are members of cohorts with field \'Custom field\' is before ' . userdate($now),
             $condition->get_config_description()
         );
     }

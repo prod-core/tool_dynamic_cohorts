@@ -99,7 +99,7 @@ class user_created_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user was created in the last 1 weeks', $condition->get_config_description());
+        $this->assertSame('Users who were created in the last 1 weeks', $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_BEFORE,
@@ -107,7 +107,7 @@ class user_created_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user was created before ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('Users who were created before ' . userdate($now), $condition->get_config_description());
 
         $condition = $this->get_condition([
             'operator' => user_last_login::OPERATOR_AFTER,
@@ -115,7 +115,7 @@ class user_created_test extends \advanced_testcase {
             'period_value' => 1,
             'period_type' => 'weeks',
         ]);
-        $this->assertSame('A user was created after ' . userdate($now), $condition->get_config_description());
+        $this->assertSame('Users who were created after ' . userdate($now), $condition->get_config_description());
     }
 
     /**

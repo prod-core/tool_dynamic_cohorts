@@ -91,7 +91,7 @@ class course_not_completed_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has not completed course "' . $course->fullname . '"',
+            'Users who have not completed course "' . $course->fullname . '"',
             $condition->get_config_description(),
         );
     }

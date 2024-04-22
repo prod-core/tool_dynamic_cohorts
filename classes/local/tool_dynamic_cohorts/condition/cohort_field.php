@@ -194,7 +194,7 @@ class cohort_field extends condition_base {
         $mform->addElement(
             'select',
             $this->get_cohort_operator_field(),
-            get_string('operator', 'tool_dynamic_cohorts'),
+            get_string('users'),
             $this->get_cohort_operators()
         );
 

@@ -102,7 +102,7 @@ class course_completed_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has completed course "' . $course->fullname . '" after ' . userdate($now),
+            'Users who have completed course "' . $course->fullname . '" after ' . userdate($now),
             $condition->get_config_description(),
         );
 
@@ -113,7 +113,7 @@ class course_completed_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has completed course "' . $course->fullname . '" before ' . userdate($now),
+            'Users who have completed course "' . $course->fullname . '" before ' . userdate($now),
             $condition->get_config_description(),
         );
 
@@ -124,7 +124,7 @@ class course_completed_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'A user has completed course "' . $course->fullname . '"  ',
+            'Users who have completed course "' . $course->fullname . '"  ',
             $condition->get_config_description(),
         );
     }

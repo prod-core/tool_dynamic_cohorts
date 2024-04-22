@@ -150,14 +150,14 @@ class user_custom_profile_test extends \advanced_testcase {
      */
     public static function config_description_data_provider(): array {
         return [
-            [condition_base::TEXT_CONTAINS, 'Test field1 contains 123', true],
-            [condition_base::TEXT_DOES_NOT_CONTAIN, 'Test field1 doesn\'t contain 123', true],
-            [condition_base::TEXT_IS_EQUAL_TO, 'Test field1 is equal to 123', true],
-            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'Test field1 isn\'t equal to 123', true],
-            [condition_base::TEXT_STARTS_WITH, 'Test field1 starts with 123', true],
-            [condition_base::TEXT_ENDS_WITH, 'Test field1 ends with 123', true],
-            [condition_base::TEXT_IS_EMPTY, 'Test field1 is empty ', true],
-            [condition_base::TEXT_IS_NOT_EMPTY, 'Test field1 is not empty ', true],
+            [condition_base::TEXT_CONTAINS, 'Users with Test field1 contains 123', true],
+            [condition_base::TEXT_DOES_NOT_CONTAIN, 'Users with Test field1 doesn\'t contain 123', true],
+            [condition_base::TEXT_IS_EQUAL_TO, 'Users with Test field1 is equal to 123', true],
+            [condition_base::TEXT_IS_NOT_EQUAL_TO, 'Users with Test field1 isn\'t equal to 123', true],
+            [condition_base::TEXT_STARTS_WITH, 'Users with Test field1 starts with 123', true],
+            [condition_base::TEXT_ENDS_WITH, 'Users with Test field1 ends with 123', true],
+            [condition_base::TEXT_IS_EMPTY, 'Users with Test field1 is empty ', true],
+            [condition_base::TEXT_IS_NOT_EMPTY, 'Users with Test field1 is not empty ', true],
         ];
     }
 
