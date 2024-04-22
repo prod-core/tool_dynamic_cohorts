@@ -87,4 +87,33 @@ class cohort_manager_test extends \advanced_testcase {
         cohort_manager::unmanage_cohort($cohort->id);
         $this->assertEquals('', $DB->get_field('cohort', 'component', ['id' => $cohort->id]));
     }
+
+    /**
+     * Test un managing cohort removes members when configured.
+     */
+    public function test_unmanage_cohort_removes_members() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $cohort = $this->getDataGenerator()->create_cohort(['component' => 'tool_dynamic_cohorts']);
+        cohort_add_member($cohort->id, $user1->id);
+        cohort_add_member($cohort->id, $user2->id);
+
+        $this->assertEquals('tool_dynamic_cohorts', $DB->get_field('cohort', 'component', ['id' => $cohort->id]));
+        $this->assertCount(2, $DB->get_records('cohort_members', ['cohortid' => $cohort->id]));
+
+        set_config('releasemembers', 0, 'tool_dynamic_cohorts');
+        cohort_manager::unmanage_cohort($cohort->id);
+        $this->assertEquals('', $DB->get_field('cohort', 'component', ['id' => $cohort->id]));
+        $this->assertCount(2, $DB->get_records('cohort_members', ['cohortid' => $cohort->id]));
+
+        set_config('releasemembers', 1, 'tool_dynamic_cohorts');
+        cohort_manager::unmanage_cohort($cohort->id);
+        $this->assertEquals('', $DB->get_field('cohort', 'component', ['id' => $cohort->id]));
+        $this->assertCount(0, $DB->get_records('cohort_members', ['cohortid' => $cohort->id]));
+    }
 }
