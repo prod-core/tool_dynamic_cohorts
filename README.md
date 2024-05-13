@@ -59,11 +59,12 @@ Conditions are simple predicates which assert something about a user in the syst
 * Cohort membership (if a user is a member of cohort(s)).
 * Course completed (if a user has completed a course).
 * Course not completed (if a user has not completed a course).
-* User last login (time since a user last logged in).
 * User created time (time since a user was created).
-* User standard profile fields (e.g. first name, last name, username, auth method and etc).
 * User custom profile fields (text and menu types are supported).
+* User enrolment (if a user is enrolled into a course).
+* User last login (time since a user last logged in).
 * User role (if a user has a role in a given context)
+* User standard profile fields (e.g. first name, last name, username, auth method and etc).
 
 ## Rules
 
