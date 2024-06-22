@@ -42,6 +42,7 @@ class matching_users extends system_report {
         $rule = rule::get_record(['id' => $ruleid], MUST_EXIST);
 
         $userentity = new user();
+        $userentity->set_table_alias('user', 'u');
         $usertablealias = $userentity->get_table_alias('user');
         $this->set_main_table('user', $usertablealias);
         $this->add_entity($userentity);
