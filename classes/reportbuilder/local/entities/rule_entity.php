@@ -34,9 +34,9 @@ class rule_entity extends base {
      * Returns the default table aliases.
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-            'tool_dynamic_cohorts' => 'tdc',
+            'tool_dynamic_cohorts',
         ];
     }
 
