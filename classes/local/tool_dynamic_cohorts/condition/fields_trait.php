@@ -411,4 +411,73 @@ trait fields_trait {
 
         return new condition_sql('', $where, $params);
     }
+
+    /**
+     * Get SQL data for multi select type fields.
+     *
+     * @param string $tablealias Alias for a table.
+     * @param string $fieldname Field name.
+     * @param bool $addspace Does a field type add space?
+     * @return condition_sql
+     */
+    protected function get_multiselect_sql(string $tablealias, string $fieldname, bool $addspace = true): condition_sql {
+        global $DB;
+
+        $fieldvalue = $this->get_field_value();
+        $operatorvalue = $this->get_operator_value();
+
+        if ($this->is_broken()) {
+            return new condition_sql('', '', []);
+        }
+        // For some reason user profile field autocomplete adds space when saving field values
+        // like implode(', ', $data). However multiselect custom field doesn't do it, instead it does
+        // like implode(',', $data). To make it flexible we add space when we consider (or not) an extra
+        // space when we build following SQL.
+        $space = $addspace ? ' ' : '';
+
+        // User data for multiselect fields is stored like  Option 1, Option 2, Option 3.
+        // So to be accurate in our SQL we have to cover three scenarios:
+        // 1. Value is in the beginning of the string.
+        // 2. Value is somewhere in the middle.
+        // 3. Value is at the end of the string.
+        // So our SQL should like:
+        // WHERE data like 'value%' OR data like '% value, %' OR data like '%, value'
+        // This is a bit hacky, but should give us accurate results.
+        $startparam = condition_sql::generate_param_alias();
+        $middleparam = condition_sql::generate_param_alias();
+        $endparam = condition_sql::generate_param_alias();
+
+        switch ($operatorvalue) {
+            case self::TEXT_IS_EQUAL_TO:
+                $value = $DB->sql_like_escape($fieldvalue);
+
+                $where = $DB->sql_like("$tablealias.$fieldname", ":$startparam", false, false);
+                $params[$startparam] = "$value%";
+
+                $where .= ' OR ' . $DB->sql_like("$tablealias.$fieldname", ":$middleparam", false, false);
+                $params[$middleparam] = "%,$space$value,$space%";
+
+                $where .= ' OR ' . $DB->sql_like("$tablealias.$fieldname", ":$endparam", false, false);
+                $params[$endparam] = "%,$space$value";
+
+                break;
+            case self::TEXT_IS_NOT_EQUAL_TO:
+                $value = $DB->sql_like_escape($fieldvalue);
+
+                $where = $DB->sql_like("$tablealias.$fieldname", ":$startparam", false, false, true);
+                $params[$startparam] = "$value%";
+
+                $where .= ' AND ' . $DB->sql_like("$tablealias.$fieldname", ":$middleparam", false, false, true);
+                $params[$middleparam] = "%,$space$value,$space%";
+
+                $where .= ' AND ' . $DB->sql_like("$tablealias.$fieldname", ":$endparam", false, false, true);
+                $params[$endparam] = "%,$space$value";
+
+                break;
+            default:
+                return new condition_sql('', '', []);
+        }
+
+        return new condition_sql('', $where, $params);
+    }
 }

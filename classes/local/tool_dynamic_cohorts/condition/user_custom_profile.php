@@ -53,8 +53,13 @@ class user_custom_profile extends user_profile {
      * @return array
      */
     protected function get_supported_custom_fields(): array {
-        return [self::FIELD_DATA_TYPE_TEXT, self::FIELD_DATA_TYPE_MENU,
-            self::FIELD_DATA_TYPE_CHECKBOX, self::FIELD_DATA_TYPE_DATETIME];
+        return [
+            self::FIELD_DATA_TYPE_TEXT,
+            self::FIELD_DATA_TYPE_MENU,
+            self::FIELD_DATA_TYPE_CHECKBOX,
+            self::FIELD_DATA_TYPE_DATETIME,
+            self::FIELD_DATA_TYPE_AUTOCOMPLETE,
+        ];
     }
 
     /**
@@ -79,6 +84,7 @@ class user_custom_profile extends user_profile {
 
             switch ($field->datatype) {
                 case self::FIELD_DATA_TYPE_MENU:
+                case self::FIELD_DATA_TYPE_AUTOCOMPLETE:
                     $options = explode("\n", $field->param1);
                     $field->param1 = array_combine($options, $options);
                     break;
@@ -124,6 +130,7 @@ class user_custom_profile extends user_profile {
                     $this->add_text_field($mform, $group, $field, $shortname);
                     break;
                 case self::FIELD_DATA_TYPE_MENU:
+                case self::FIELD_DATA_TYPE_AUTOCOMPLETE:
                     $this->add_menu_field($mform, $group, $field, $shortname);
                     break;
                 case self::FIELD_DATA_TYPE_CHECKBOX:
@@ -191,6 +198,9 @@ class user_custom_profile extends user_profile {
                 break;
             case self::FIELD_DATA_TYPE_DATETIME:
                 $result = $this->get_date_sql($ud, 'data');
+                break;
+            case self::FIELD_DATA_TYPE_AUTOCOMPLETE:
+                $result = $this->get_multiselect_sql($ud, 'data');
                 break;
         }
 

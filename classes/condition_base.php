@@ -56,6 +56,11 @@ abstract class condition_base {
     public const FIELD_DATA_TYPE_DATETIME = 'datetime';
 
     /**
+     * Value for autocomplete field types.
+     */
+    public const FIELD_DATA_TYPE_AUTOCOMPLETE = 'autocomplete';
+
+    /**
      * Value for operator text contains.
      */
     public const TEXT_CONTAINS = 1;
