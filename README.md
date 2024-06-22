@@ -8,9 +8,11 @@ Dynamic cohorts plugin allows dynamically add and remove users from cohorts base
 
 # Versions and branches
 
-| Moodle Version | Branch            | 
-|----------------|-------------------|
-| Moodle 4.1+    | MOODLE_401_STABLE | 
+| Moodle Version   | Branch            | 
+|------------------|-------------------|
+| Moodle 4.1 - 4.3 | MOODLE_401_STABLE | 
+| Moodle 4.4+      | MOODLE_404_STABLE | 
+
 
 ## Installing via uploaded ZIP file ##
 
