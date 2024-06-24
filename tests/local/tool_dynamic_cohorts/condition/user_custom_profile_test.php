@@ -289,8 +289,6 @@ class user_custom_profile_test extends \advanced_testcase {
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $this->assertCount(1, $DB->get_records_sql($sql, $result->get_params()));
 
-        $test = $DB->get_records('user_info_data');
-
         $fieldname = 'profile_field_' . $fielddate->shortname;
         $condition->set_config_data([
             'profilefield' => $fieldname,
@@ -315,6 +313,33 @@ class user_custom_profile_test extends \advanced_testcase {
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $this->assertCount(1, $DB->get_records_sql($sql, $result->get_params()));
 
+        $fieldname = 'profile_field_' . $fielddate->shortname;
+        $condition->set_config_data([
+            'profilefield' => $fieldname,
+            $fieldname . '_operator' => condition_base::DATE_IN_THE_FUTURE,
+            $fieldname . '_value' => $now,
+            'include_missing_data' => 0,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $users = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($user2->id, $users);
+
+        $fieldname = 'profile_field_' . $fielddate->shortname;
+        $condition->set_config_data([
+            'profilefield' => $fieldname,
+            $fieldname . '_operator' => condition_base::DATE_IN_THE_PAST,
+            $fieldname . '_value' => $now,
+            'include_missing_data' => 0,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $users = $DB->get_records_sql($sql, $result->get_params());
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($user1->id, $users);
     }
 
     /**

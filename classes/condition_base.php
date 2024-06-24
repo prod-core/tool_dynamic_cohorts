@@ -111,6 +111,16 @@ abstract class condition_base {
     public const DATE_IS_BEFORE = 2;
 
     /**
+     * Value for operator date is in the past.
+     */
+    public const DATE_IN_THE_PAST = 30;
+
+    /**
+     * Value for operator date is in the future.
+     */
+    public const DATE_IN_THE_FUTURE = 40;
+
+    /**
      * Condition persistent object.
      *
      * @var condition $condition

@@ -68,6 +68,8 @@ trait fields_trait {
             self::DATE_IS_BEFORE => get_string('isbefore', 'tool_dynamic_cohorts'),
             self::TEXT_IS_EMPTY => get_string('isempty', 'filters'),
             self::TEXT_IS_NOT_EMPTY => get_string('isnotempty', 'tool_dynamic_cohorts'),
+            self::DATE_IN_THE_PAST => get_string('inthepast', 'tool_dynamic_cohorts'),
+            self::DATE_IN_THE_FUTURE => get_string('inthefuture', 'tool_dynamic_cohorts'),
         ];
     }
 
@@ -129,7 +131,8 @@ trait fields_trait {
             }
         }
 
-        if (in_array($this->get_operator_value(), [self::TEXT_IS_EMPTY, self::TEXT_IS_NOT_EMPTY])) {
+        $nullvalue = [self::TEXT_IS_EMPTY, self::TEXT_IS_NOT_EMPTY, self::DATE_IN_THE_PAST, self::DATE_IN_THE_FUTURE];
+        if (in_array($this->get_operator_value(), $nullvalue)) {
             $fieldvalue = null;
         }
 
@@ -236,7 +239,15 @@ trait fields_trait {
 
         $elements[] = $mform->createElement('date_time_selector', $shortname . '_value');
         $mform->setDefault($shortname . '_value', usergetmidnight(time()));
-        $mform->hideIf($shortname . '_value', $shortname . '_operator', 'in', self::TEXT_IS_EMPTY . '|' . self::TEXT_IS_NOT_EMPTY);
+        $mform->hideIf(
+            $shortname . '_value',
+            $shortname . '_operator',
+            'in',
+            self::TEXT_IS_EMPTY . '|' .
+            self::TEXT_IS_NOT_EMPTY . '|' .
+            self::DATE_IN_THE_PAST . '|' .
+            self::DATE_IN_THE_FUTURE
+        );
 
         $group[] = $mform->createElement('group', $shortname, '', $elements, '', false);
 
@@ -403,7 +414,15 @@ trait fields_trait {
                 break;
             case self::DATE_IS_AFTER:
                 $where = "$tablealias.$fieldname >= :$param";
-                $params[$param] = (int)  $fieldvalue;
+                $params[$param] = (int) $fieldvalue;
+                break;
+            case self::DATE_IN_THE_FUTURE:
+                $where = "$tablealias.$fieldname >= :$param";
+                $params[$param] = time();
+                break;
+            case self::DATE_IN_THE_PAST:
+                $where = "$tablealias.$fieldname <= :$param";
+                $params[$param] = time();
                 break;
             default:
                 return new condition_sql('', '', []);
