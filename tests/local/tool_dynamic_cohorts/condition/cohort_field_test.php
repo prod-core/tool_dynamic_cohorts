@@ -501,6 +501,30 @@ class cohort_field_test extends \advanced_testcase {
         $result = $condition->get_sql();
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $this->assertCount($totalusers - 1, $DB->get_records_sql($sql, $result->get_params()));
+
+        // User 1 and user 2 as they are members of cohort 1.
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldname,
+            $datefieldname . '_operator' => condition_base::DATE_IN_THE_PAST,
+            $datefieldname . '_value' => $now,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount(2, $DB->get_records_sql($sql, $result->get_params()));
+
+        // No cohort with a date is in the future. No users should be returned.
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldname,
+            $datefieldname . '_operator' => condition_base::DATE_IN_THE_FUTURE,
+            $datefieldname . '_value' => $now,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $this->assertCount(0, $DB->get_records_sql($sql, $result->get_params()));
     }
 
     /**
