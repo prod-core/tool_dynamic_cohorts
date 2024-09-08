@@ -85,7 +85,7 @@ class user_custom_profile extends user_profile {
             switch ($field->datatype) {
                 case self::FIELD_DATA_TYPE_MENU:
                 case self::FIELD_DATA_TYPE_AUTOCOMPLETE:
-                    $options = explode("\n", $field->param1);
+                    $options = explode("\n", (string) $field->param1);
                     $field->param1 = array_combine($options, $options);
                     break;
                 case self::FIELD_DATA_TYPE_TEXT:
