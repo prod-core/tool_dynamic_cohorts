@@ -26,7 +26,7 @@ import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 import Fragment from 'core/fragment';
 import ModalEvents from 'core/modal_events';
-import ModalFactory from 'core/modal_factory';
+import ModalSaveCancel from 'core/modal_save_cancel';
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
@@ -80,8 +80,7 @@ const displayModalForm = (className, defaults) => {
         defaults = '';
     }
 
-    ModalFactory.create({
-        type: ModalFactory.types.SAVE_CANCEL,
+    ModalSaveCancel.create({
         title: getString('conditionformtitle', 'tool_dynamic_cohorts'),
         body: getModalFormBody(className, '', defaults),
         large: true,

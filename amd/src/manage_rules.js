@@ -25,7 +25,7 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import ModalEvents from 'core/modal_events';
-import ModalFactory from 'core/modal_factory';
+import ModalAlert from "core/local/modal/alert";
 import {get_string as getString} from 'core/str';
 import * as DynamicTable from 'core_table/dynamic';
 
@@ -87,8 +87,7 @@ const initRuleConditionsModals = () => {
                         'tool_dynamic_cohorts/conditions',
                         {'conditions' : conditions, 'hidecontrols': true}
                     ).then(function(html) {
-                        ModalFactory.create({
-                            type: ModalFactory.types.ALERT,
+                        ModalAlert.create({
                             title: getString('conditionsformtitle', 'tool_dynamic_cohorts'),
                             body: html,
                             large: true,
