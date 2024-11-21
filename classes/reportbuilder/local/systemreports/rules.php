@@ -114,6 +114,11 @@ class rules extends system_report {
         $cohortentity->get_column('name')
             ->set_title(new lang_string('cohort', 'tool_dynamic_cohorts'));
 
+        $this->add_filter_from_entity('rule_entity:name');
+        $this->add_filter_from_entity('rule_entity:bulkprocessing');
+        $this->add_filter_from_entity('rule_entity:broken');
+        $this->add_filter_from_entity('rule_entity:enabled');
+
         $this->set_initial_sort_column('rule_entity:name', SORT_ASC);
     }
 
