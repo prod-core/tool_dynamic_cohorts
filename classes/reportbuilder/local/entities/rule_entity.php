@@ -17,7 +17,10 @@
 namespace tool_dynamic_cohorts\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
+use core_reportbuilder\local\filters\boolean_select;
+use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\report\column;
+use core_reportbuilder\local\report\filter;
 use lang_string;
 use tool_dynamic_cohorts\rule;
 
@@ -55,6 +58,10 @@ class rule_entity extends base {
     public function initialise(): base {
         foreach ($this->get_all_columns() as $column) {
             $this->add_column($column);
+        }
+
+        foreach ($this->get_all_filters() as $filter) {
+            $this->add_filter($filter);
         }
 
         return $this;
@@ -173,5 +180,55 @@ class rule_entity extends base {
             });
 
         return $columns;
+    }
+
+    /**
+     * Return list of all available filters
+     *
+     * @return filter[]
+     */
+    protected function get_all_filters(): array {
+        $tablealias = $this->get_table_alias('tool_dynamic_cohorts');
+
+        // Name filter.
+        $filters[] = (new filter(
+            text::class,
+            'name',
+            new lang_string('name', 'core_cohort'),
+            $this->get_entity_name(),
+            "{$tablealias}.name"
+        ))
+            ->add_joins($this->get_joins());
+
+        // Bulk processing filter.
+        $filters[] = (new filter(
+            boolean_select::class,
+            'bulkprocessing',
+            new lang_string('rule_entity.bulkprocessing', 'tool_dynamic_cohorts'),
+            $this->get_entity_name(),
+            "{$tablealias}.bulkprocessing"
+        ))
+            ->add_joins($this->get_joins());
+
+        // Broken filter.
+        $filters[] = (new filter(
+            boolean_select::class,
+            'broken',
+            new lang_string('broken', 'tool_dynamic_cohorts'),
+            $this->get_entity_name(),
+            "{$tablealias}.broken"
+        ))
+            ->add_joins($this->get_joins());
+
+        // Enabled filter.
+        $filters[] = (new filter(
+            boolean_select::class,
+            'enabled',
+            new lang_string('enabled', 'tool_dynamic_cohorts'),
+            $this->get_entity_name(),
+            "{$tablealias}.enabled"
+        ))
+            ->add_joins($this->get_joins());
+        return $filters;
     }
 }
