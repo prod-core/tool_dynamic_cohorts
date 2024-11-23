@@ -17,18 +17,14 @@
 namespace tool_dynamic_cohorts\external;
 
 use context_system;
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_multiple_structure;
-use external_single_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
 use tool_dynamic_cohorts\condition_base;
 use tool_dynamic_cohorts\rule;
 use invalid_parameter_exception;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/lib/externallib.php');
 
 /**
  * Rule conditions external APIs.

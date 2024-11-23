@@ -18,7 +18,6 @@ namespace tool_dynamic_cohorts\external;
 
 use externallib_advanced_testcase;
 use tool_dynamic_cohorts\rule;
-use tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,27 +31,27 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright  2024 Catalyst IT
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers     \tool_dynamic_cohorts\external\matching_users
+ * @covers     \tool_dynamic_cohorts\external\rules
  */
-class matching_users_test extends externallib_advanced_testcase {
+class rules_test extends externallib_advanced_testcase {
 
     /**
      * Test exception if rule is not exist.
      */
-    public function test_get_total_throws_exception_on_invalid_rule() {
+    public function test_delete_rules_exception_on_invalid_rule() {
         $this->resetAfterTest();
 
         $this->setAdminUser();
         $this->expectException(\invalid_parameter_exception::class);
-        $this->expectExceptionMessage('Rule does not exist');
+        $this->expectExceptionMessage('Rule does not exist. ID: 777');
 
-        matching_users::get_total(777);
+        rules::delete_rules([777]);
     }
 
     /**
      * Test required permissions.
      */
-    public function test_get_total_permissions() {
+    public function test_delete_rules_permissions() {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -60,47 +59,51 @@ class matching_users_test extends externallib_advanced_testcase {
         $this->expectException(\required_capability_exception::class);
         $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (Manage rules).');
 
-        matching_users::get_total(777);
+        rules::delete_rules([777]);
     }
 
     /**
      * Test can get total.
      */
-    public function test_get_total_empty() {
+    public function test_exception_delete_rules_when_one_is_invalid() {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $rule = new rule(0, (object)['name' => 'Test rule 1']);
         $rule->save();
 
-        $this->assertSame(0, matching_users::get_total($rule->get('id')));
+        $this->expectException(\invalid_parameter_exception::class);
+        $this->expectExceptionMessage('Rule does not exist. ID: 777');
+
+        rules::delete_rules([$rule->get('id'), 777]);
     }
 
     /**
      * Test can get total.
      */
-    public function test_get_total() {
+    public function test_delete_rules_keep_rules_when_one_is_invalid() {
         $this->resetAfterTest();
-
         $this->setAdminUser();
 
-        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1username']);
-        $user2 = $this->getDataGenerator()->create_user(['username' => 'user2username']);
-        $user3 = $this->getDataGenerator()->create_user(['username' => 'test']);
+        $rule1 = new rule(0, (object)['name' => 'Test rule 1']);
+        $rule1->save();
 
-        $cohort = $this->getDataGenerator()->create_cohort();
+        $rule2 = new rule(0, (object)['name' => 'Test rule 2']);
+        $rule2->save();
 
-        $rule = new rule(0, (object)['name' => 'Test rule 1', 'cohortid' => $cohort->id]);
-        $rule->save();
+        $this->assertCount(2, rule::get_records());
 
-        $condition = user_profile::get_instance(0, (object)['ruleid' => $rule->get('id'), 'sortorder' => 1]);
-        $condition->set_config_data([
-            'profilefield' => 'username',
-            'username_operator' => user_profile::TEXT_IS_EQUAL_TO,
-            'username_value' => 'user1username',
-        ]);
-        $condition->get_record()->save();
+        $this->expectException(\required_capability_exception::class);
+        $this->expectExceptionMessage('Rule does not exist. ID: 777');
 
-        $this->assertSame(1, matching_users::get_total($rule->get('id')));
+        try {
+            rules::delete_rules([$rule1->get('id'), $rule2->get('id'), 777]);
+        } catch (\invalid_parameter_exception $exception) {
+            $this->assertSame(
+                'Invalid parameter value detected (Rule does not exist. ID: 777)',
+                $exception->getMessage()
+            );
+            $this->assertCount(2, rule::get_records());
+        }
     }
 }

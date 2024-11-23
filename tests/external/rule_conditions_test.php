@@ -33,8 +33,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @package     tool_dynamic_cohorts
  * @copyright   2024 Catalyst IT
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-
- * @runTestsInSeparateProcesses
+ *
  * @covers     \tool_dynamic_cohorts\external\rule_conditions
  */
 class rule_conditions_test extends externallib_advanced_testcase {
