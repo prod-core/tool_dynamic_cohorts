@@ -58,8 +58,6 @@ class rules extends external_api {
      * @return array
      */
     public static function delete_rules(array $ruleids): array {
-        global $DB;
-
         self::validate_parameters(self::delete_rules_parameters(), ['ruleids' => $ruleids]);
 
         $context = context_system::instance();
@@ -67,19 +65,19 @@ class rules extends external_api {
         require_capability('tool/dynamic_cohorts:manage', $context);
 
         // We would like to treat deletion for multiple rules as one operation.
-        // If one failed we would like to fail whole call and roll back.
-        $transaction = $DB->start_delegated_transaction();
-        try {
-            foreach ($ruleids as $ruleid) {
-                $rule = rule::get_record(['id' => (int) $ruleid]);
-                if (empty($rule)) {
-                    throw new invalid_parameter_exception('Rule does not exist. ID: ' . $ruleid);
-                }
-                rule_manager::delete_rule($rule);
-                //$transaction->allow_commit();
+        // So let's check that all rules exist and then delete them.
+        // Otherwise throw an exception and fail whole WS call.
+        $rulestodelete = [];
+        foreach ($ruleids as $ruleid) {
+            $rule = rule::get_record(['id' => (int) $ruleid]);
+            if (empty($rule)) {
+                throw new invalid_parameter_exception('Rule does not exist. ID: ' . $ruleid);
             }
-        } catch (throwable $ex) {
-            $transaction->rollback($ex);
+            $rulestodelete[] = $rule;
+        }
+
+        foreach ($rulestodelete as $rule) {
+            rule_manager::delete_rule($rule);
         }
 
         return [];
@@ -112,14 +110,14 @@ class rules extends external_api {
      * @return array
      */
     public static function toggle_status(int $ruleid): array {
-        self::validate_parameters(self::delete_rules_parameters(), ['ruleid' => $ruleid]);
+        self::validate_parameters(self::toggle_status_parameters(), ['ruleid' => $ruleid]);
 
         self::validate_context(context_system::instance());
         require_capability('tool/dynamic_cohorts:manage', context_system::instance());
 
         $rule = rule::get_record(['id' => $ruleid]);
         if (empty($rule)) {
-            throw new invalid_parameter_exception('Rule does not exist.');
+            throw new invalid_parameter_exception('Rule does not exist. ID: ' . $ruleid);
         }
 
         if ($rule->is_broken()) {
@@ -128,7 +126,7 @@ class rules extends external_api {
             $rule->save();
             rule_updated::create(['other' => ['ruleid' => $rule->get('id')]])->trigger();
 
-            throw new invalid_parameter_exception('A broken rule can\'t be enabled');
+            throw new invalid_parameter_exception('A broken rule can\'t be enabled ID: ' . $ruleid);
         }
 
         $newvalue = (int) !$rule->is_enabled();

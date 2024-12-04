@@ -63,7 +63,7 @@ class rules_test extends externallib_advanced_testcase {
     }
 
     /**
-     * Test can get total.
+     * Test exception thrown on deleting invalid rule.
      */
     public function test_exception_delete_rules_when_one_is_invalid() {
         $this->resetAfterTest();
@@ -79,7 +79,7 @@ class rules_test extends externallib_advanced_testcase {
     }
 
     /**
-     * Test can get total.
+     * Test rules are not deleted if one is invalid.
      */
     public function test_delete_rules_keep_rules_when_one_is_invalid() {
         $this->resetAfterTest();
@@ -93,9 +93,6 @@ class rules_test extends externallib_advanced_testcase {
 
         $this->assertCount(2, rule::get_records());
 
-        $this->expectException(\required_capability_exception::class);
-        $this->expectExceptionMessage('Rule does not exist. ID: 777');
-
         try {
             rules::delete_rules([$rule1->get('id'), $rule2->get('id'), 777]);
         } catch (\invalid_parameter_exception $exception) {
@@ -105,5 +102,70 @@ class rules_test extends externallib_advanced_testcase {
             );
             $this->assertCount(2, rule::get_records());
         }
+    }
+
+    /**
+     * Test exception if rule is not exist.
+     */
+    public function test_toggle_status_exception_on_invalid_rule() {
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+        $this->expectException(\invalid_parameter_exception::class);
+        $this->expectExceptionMessage('Rule does not exist. ID: 777');
+
+        rules::toggle_status(777);
+    }
+
+    /**
+     * Test required permissions.
+     */
+    public function test_toggle_status_permissions() {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $this->expectException(\required_capability_exception::class);
+        $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (Manage rules).');
+
+        rules::toggle_status(777);
+    }
+
+    /**
+     * Test exception is thrown trying to toggle a broken rule
+     */
+    public function test_exception_toggle_status_on_broken_rule() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $rule = new rule(0, (object)['name' => 'Test rule 1']);
+        $rule->set('broken', 1);
+        $rule->save();
+
+        $this->expectException(\invalid_parameter_exception::class);
+        $this->expectExceptionMessage('A broken rule can\'t be enabled ID: ' . $rule->get('id'));
+
+        rules::toggle_status($rule->get('id'));
+    }
+
+    /**
+     * Test toggling status on rule.
+     */
+    public function test_toggle_status_on_rule() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $rule = new rule(0, (object)['name' => 'Test rule 1']);
+        $rule->save();
+
+        $this->assertFalse($rule->is_enabled());
+
+        rules::toggle_status($rule->get('id'));
+        $rule = rule::get_record(['id' => $rule->get('id')]);
+        $this->assertTrue($rule->is_enabled());
+
+        rules::toggle_status($rule->get('id'));
+        $rule = rule::get_record(['id' => $rule->get('id')]);
+        $this->assertFalse($rule->is_enabled());
     }
 }
