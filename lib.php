@@ -22,7 +22,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core_reportbuilder\system_report_factory;
 use tool_dynamic_cohorts\condition_form;
+use tool_dynamic_cohorts\rule;
+use tool_dynamic_cohorts\reportbuilder\local\systemreports\matching_users;
 
 /**
  * A new condition form as a fragment.
@@ -59,4 +62,31 @@ function tool_dynamic_cohorts_output_fragment_condition_form(array $args): strin
     }
 
     return $mform->render();
+}
+
+/**
+ * A matching users table as a fragment.
+ *
+ * @param array $args List of named arguments for the fragment loader.
+ * @return string
+ */
+function tool_dynamic_cohorts_output_fragment_matching_users(array $args): string {
+    $args = (object) $args;
+    $ruleid = clean_param($args->ruleid, PARAM_INT);
+
+    $rule = rule::get_record(['id' => $ruleid]);
+    if (empty($rule)) {
+        throw new dml_missing_record_exception(null);
+    }
+
+    $report = system_report_factory::create(
+        matching_users::class,
+        context_system::instance(),
+        'tool_dynamic_cohorts',
+        '',
+        0,
+        ['ruleid' => $ruleid]
+    );
+
+    return $report->output();
 }

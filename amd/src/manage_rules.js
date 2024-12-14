@@ -25,9 +25,10 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import ModalEvents from 'core/modal_events';
-import ModalAlert from "core/local/modal/alert";
 import {get_string as getString} from 'core/str';
 import * as DynamicTable from 'core_table/dynamic';
+import Fragment from 'core/fragment';
+import ModalCancel from 'core/modal_cancel';
 
 /**
  * A list of used selectors.
@@ -41,18 +42,76 @@ const SELECTORS = {
  * Init of the module.
  */
 export const init = () => {
-    loadMatchingUsers();
-    initRuleConditionsModals();
+    loadMatchingUsers(document);
+    initMatchingUsersModals(document);
+    initRuleConditionsModals(document);
 
-    document.addEventListener(DynamicTable.Events.tableContentRefreshed, () => loadMatchingUsers());
-    document.addEventListener(DynamicTable.Events.tableContentRefreshed, () => initRuleConditionsModals());
+    document.addEventListener(DynamicTable.Events.tableContentRefreshed, e => {
+        const tableRoot = DynamicTable.getTableFromId(e.target.dataset.tableUniqueid);
+
+        initMatchingUsersModals(tableRoot);
+        loadMatchingUsers(tableRoot);
+        initRuleConditionsModals(tableRoot);
+    });
+};
+
+/**
+ * Initialise modals for matching users.
+ *
+ * @param {Element} root
+ */
+const initMatchingUsersModals = (root) => {
+    Array.from(root.getElementsByClassName(SELECTORS.RULE_MATCHING_USERS)).forEach((collection) => {
+        const ruleid = collection.dataset.ruleid;
+        const link = collection.children[1];
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            displayMatchingUsers(ruleid);
+        });
+    });
+};
+
+/**
+ * Display matching users in the modal form.
+ *
+ * @param {string} ruleid
+ */
+const displayMatchingUsers = (ruleid) => {
+
+    ModalCancel.create({
+        title: getString('matchingusers', 'tool_dynamic_cohorts'),
+        body: getMatchingUsersModalBody(ruleid),
+        large: true,
+    }).then(function (modal) {
+        modal.getRoot().on(ModalEvents.hidden, function() {
+            modal.destroy();
+        });
+
+        modal.show();
+    });
+};
+
+/**
+ * Get modal html body for matching users using fragment API.
+ *
+ * @param {string} ruleid
+ * @returns {Promise}
+ */
+const getMatchingUsersModalBody = (ruleid) => {
+    const params = {
+        ruleid: ruleid,
+    };
+
+    return Fragment.loadFragment('tool_dynamic_cohorts', 'matching_users', 1, params);
 };
 
 /**
  * Load matching users for each rule.
+ *
+ * @param {Element} root
  */
-const loadMatchingUsers = () => {
-    Array.from(document.getElementsByClassName(SELECTORS.RULE_MATCHING_USERS)).forEach((collection) => {
+const loadMatchingUsers = (root) => {
+    Array.from(root.getElementsByClassName(SELECTORS.RULE_MATCHING_USERS)).forEach((collection) => {
         const ruleid = collection.dataset.ruleid;
         const loader = collection.children[0];
         const link = collection.children[1];
@@ -74,9 +133,11 @@ const loadMatchingUsers = () => {
 
 /**
  * Initialise displaying each rule conditions in a modal.
+ *
+ * @param {Element} root
  */
-const initRuleConditionsModals = () => {
-    document.querySelectorAll(SELECTORS.RULE_CONDITIONS).forEach(link => {
+const initRuleConditionsModals = (root) => {
+    root.querySelectorAll(SELECTORS.RULE_CONDITIONS).forEach(link => {
         let ruleid = link.dataset.ruleid;
         link.addEventListener('click', function() {
             Ajax.call([{
@@ -87,7 +148,7 @@ const initRuleConditionsModals = () => {
                         'tool_dynamic_cohorts/conditions',
                         {'conditions' : conditions, 'hidecontrols': true}
                     ).then(function(html) {
-                        ModalAlert.create({
+                        ModalCancel.create({
                             title: getString('conditionsformtitle', 'tool_dynamic_cohorts'),
                             body: html,
                             large: true,
