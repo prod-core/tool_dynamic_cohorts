@@ -48,16 +48,17 @@ class matching_users extends system_report {
         $this->add_entity($userentity);
 
         $conditions = $rule->get_condition_records();
+        $sql = condition_manager::build_sql_data($conditions, $rule->get('operator'));
+
         if (empty($conditions) || $rule->is_broken()) {
             // No conditions. Filter out all users.
             $this->add_base_condition_sql(' true = false');
+        } else {
+            $this->add_base_condition_sql($sql->get_where(), $sql->get_params());
         }
-
-        $sql = condition_manager::build_sql_data($conditions, $rule->get('operator'));
 
         $this->add_base_fields('DISTINCT u.id');
         $this->add_join($sql->get_join());
-        $this->add_base_condition_sql($sql->get_where(), $sql->get_params());
 
         $this->add_column_from_entity('user:fullnamewithlink');
         $this->add_column_from_entity('user:username');

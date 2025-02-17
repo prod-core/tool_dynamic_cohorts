@@ -29,6 +29,8 @@ import {get_string as getString} from 'core/str';
 import * as DynamicTable from 'core_table/dynamic';
 import Fragment from 'core/fragment';
 import ModalCancel from 'core/modal_cancel';
+import DynamicTableSelectors from 'core_table/local/dynamic/selectors';
+import {add as notifyUser} from 'core/toast';
 
 /**
  * A list of used selectors.
@@ -36,6 +38,8 @@ import ModalCancel from 'core/modal_cancel';
 const SELECTORS = {
     RULE_MATCHING_USERS: 'tool-dynamic-cohorts-matching-users',
     RULE_CONDITIONS: '.tool-dynamic-cohorts-condition-view',
+    RULE_TOGGLE: '.tool-dynamic-cohorts-rule-toggle',
+    RULE_DELETE: '.tool-dynamic-cohorts-rule-delete',
 };
 
 /**
@@ -45,6 +49,9 @@ export const init = () => {
     loadMatchingUsers(document);
     initMatchingUsersModals(document);
     initRuleConditionsModals(document);
+    initRuleToggle(document);
+    initRuleDelete(document);
+
 
     document.addEventListener(DynamicTable.Events.tableContentRefreshed, e => {
         const tableRoot = DynamicTable.getTableFromId(e.target.dataset.tableUniqueid);
@@ -52,6 +59,8 @@ export const init = () => {
         initMatchingUsersModals(tableRoot);
         loadMatchingUsers(tableRoot);
         initRuleConditionsModals(tableRoot);
+        initRuleToggle(tableRoot);
+        initRuleDelete(tableRoot);
     });
 };
 
@@ -166,6 +175,96 @@ const initRuleConditionsModals = (root) => {
                     Notification.exception(response);
                 }
             }]);
+        });
+    });
+};
+
+/**
+ * Send feedback to a user.
+ *
+ * @param {string} action Action to send feedback about.
+ */
+const sendFeedback = (action) => {
+    getString('completed:' + action, 'tool_dynamic_cohorts')
+        .then(message => {
+            notifyUser(message);
+        }).catch(Notification.exception);
+};
+
+/**
+ *
+ * @param link
+ * @returns {*}
+ */
+const getDynamicTableFromLink = (link) => {
+    return link.closest(DynamicTableSelectors.main.region);
+};
+
+
+/**
+ * Initialise displaying each rule conditions in a modal.
+ *
+ * @param {Element} root
+ */
+const initRuleToggle = (root) => {
+    root.querySelectorAll(SELECTORS.RULE_TOGGLE).forEach(link => {
+        let ruleid = link.dataset.ruleid;
+        let action = link.dataset.action;
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            Notification.confirm(
+                getString('confirm', 'moodle'),
+                getString(action + '_confirm', 'tool_dynamic_cohorts', ruleid),
+                getString('yes', 'moodle'),
+                getString('no', 'moodle'),
+                function () {
+                    Ajax.call([{
+                        methodname: 'tool_dynamic_cohorts_toggle_rule_status',
+                        args: {ruleid: ruleid},
+                        done: function () {
+                            sendFeedback(action);
+                            DynamicTable.refreshTableContent(getDynamicTableFromLink(link))
+                                .catch(Notification.exception);
+                        },
+                        fail: function (response) {
+                            Notification.exception(response);
+                        }
+                    }]);
+                });
+        });
+    });
+};
+
+/**
+ * Initialise displaying each rule conditions in a modal.
+ *
+ * @param {Element} root
+ */
+const initRuleDelete = (root) => {
+    root.querySelectorAll(SELECTORS.RULE_DELETE).forEach(link => {
+        let ruleid = link.dataset.ruleid;
+        let action = link.dataset.action;
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            Notification.confirm(
+                getString('confirm', 'moodle'),
+                getString(action + '_confirm', 'tool_dynamic_cohorts', ruleid),
+                getString('yes', 'moodle'),
+                getString('no', 'moodle'),
+                function () {
+                    Ajax.call([{
+                        methodname: 'tool_dynamic_cohorts_delete_rules`',
+                        args: {ruleids: {ruleid}},
+                        done: function () {
+                            sendFeedback(action);
+                            DynamicTable.refreshTableContent(getDynamicTableFromLink(link))
+                                .catch(Notification.exception);
+                        },
+                        fail: function (response) {
+                            Notification.exception(response);
+                        }
+                    }]);
+                });
         });
     });
 };

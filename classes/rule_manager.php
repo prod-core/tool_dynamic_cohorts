@@ -264,6 +264,9 @@ class rule_manager {
     public static function get_matching_users_count(rule $rule, ?int $userid = null): int {
         global $DB;
 
+        // TODO: add caching as we would need to return users count on each page refresh.
+        // Cache should be rebuilt on every rule change for a specific rule.
+
         $conditions = $rule->get_condition_records();
 
         if (empty($conditions)) {

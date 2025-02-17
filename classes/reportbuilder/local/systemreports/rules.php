@@ -149,7 +149,7 @@ class rules extends system_report {
         $this->add_action((new action(
             new moodle_url('/admin/tool/dynamic_cohorts/toggle.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
             new pix_icon('t/hide', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'enable'],
             false,
             new lang_string('enable')
         ))->add_callback(function(\stdClass $row): bool {
@@ -159,7 +159,7 @@ class rules extends system_report {
         $this->add_action((new action(
             new moodle_url('/admin/tool/dynamic_cohorts/toggle.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
             new pix_icon('t/show', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'disable'],
             false,
             new lang_string('disable')
         ))->add_callback(function(\stdClass $row): bool {
@@ -177,7 +177,7 @@ class rules extends system_report {
         $this->add_action((new action(
             new moodle_url('/admin/tool/dynamic_cohorts/delete.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
             new pix_icon('t/delete', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-delete', 'data-ruleid' => ':id', 'data-action' => 'delete'],
             false,
             new lang_string('delete')
         )));
