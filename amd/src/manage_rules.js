@@ -227,7 +227,7 @@ const initRuleToggle = (root) => {
             e.preventDefault();
             Notification.confirm(
                 getString('confirm', 'moodle'),
-                getString(action + '_confirm', 'tool_dynamic_cohorts', ruleid),
+                getString(action + '_confirm', 'tool_dynamic_cohorts'),
                 getString('yes', 'moodle'),
                 getString('no', 'moodle'),
                 function () {
