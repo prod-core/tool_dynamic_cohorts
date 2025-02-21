@@ -22,7 +22,6 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_value;
 use core_external\external_single_structure;
-use Throwable;
 use tool_dynamic_cohorts\event\rule_updated;
 use tool_dynamic_cohorts\rule;
 use invalid_parameter_exception;
@@ -121,7 +120,7 @@ class rules extends external_api {
         }
 
         if ($rule->is_broken()) {
-            // Disable broken rule
+            // Disable broken rule.
             $rule->set('enabled', 0);
             $rule->save();
             rule_updated::create(['other' => ['ruleid' => $rule->get('id')]])->trigger();

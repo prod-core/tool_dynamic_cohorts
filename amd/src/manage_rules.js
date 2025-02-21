@@ -31,6 +31,7 @@ import Fragment from 'core/fragment';
 import ModalCancel from 'core/modal_cancel';
 import DynamicTableSelectors from 'core_table/local/dynamic/selectors';
 import {add as notifyUser} from 'core/toast';
+import ModalForm from 'core_form/modalform';
 
 /**
  * A list of used selectors.
@@ -40,18 +41,21 @@ const SELECTORS = {
     RULE_CONDITIONS: '.tool-dynamic-cohorts-condition-view',
     RULE_TOGGLE: '.tool-dynamic-cohorts-rule-toggle',
     RULE_DELETE: '.tool-dynamic-cohorts-rule-delete',
+    RULE_EDIT: '.tool-dynamic-cohorts-rule-edit',
+    RULE_ADD: '[data-action=addrule]',
 };
 
 /**
  * Init of the module.
  */
 export const init = () => {
+    initRuleAdd();
     loadMatchingUsers(document);
     initMatchingUsersModals(document);
     initRuleConditionsModals(document);
     initRuleToggle(document);
     initRuleDelete(document);
-
+    initRuleEdit(document);
 
     document.addEventListener(DynamicTable.Events.tableContentRefreshed, e => {
         const tableRoot = DynamicTable.getTableFromId(e.target.dataset.tableUniqueid);
@@ -61,6 +65,7 @@ export const init = () => {
         initRuleConditionsModals(tableRoot);
         initRuleToggle(tableRoot);
         initRuleDelete(tableRoot);
+        initRuleEdit(tableRoot);
     });
 };
 
@@ -192,14 +197,22 @@ const sendFeedback = (action) => {
 };
 
 /**
- *
- * @param link
- * @returns {*}
+ * Send warning to a user.
  */
-const getDynamicTableFromLink = (link) => {
-    return link.closest(DynamicTableSelectors.main.region);
+const sendWarning = () => {
+    getString('ruledisabledpleasereview', 'tool_dynamic_cohorts')
+        .then(message => {
+            notifyUser(message, {type: 'warning', closeButton: true, delay: 10000});
+        }).catch(Notification.exception);
 };
 
+/**
+ * Get dynamic table root.
+ * @returns {*}
+ */
+const getTableRoot = () => {
+    return document.querySelector(DynamicTableSelectors.main.region);
+};
 
 /**
  * Initialise displaying each rule conditions in a modal.
@@ -223,7 +236,7 @@ const initRuleToggle = (root) => {
                         args: {ruleid: ruleid},
                         done: function () {
                             sendFeedback(action);
-                            DynamicTable.refreshTableContent(getDynamicTableFromLink(link))
+                            DynamicTable.refreshTableContent(getTableRoot())
                                 .catch(Notification.exception);
                         },
                         fail: function (response) {
@@ -257,7 +270,7 @@ const initRuleDelete = (root) => {
                         args: {ruleids: {ruleid}},
                         done: function () {
                             sendFeedback(action);
-                            DynamicTable.refreshTableContent(getDynamicTableFromLink(link))
+                            DynamicTable.refreshTableContent(getTableRoot())
                                 .catch(Notification.exception);
                         },
                         fail: function (response) {
@@ -266,5 +279,63 @@ const initRuleDelete = (root) => {
                     }]);
                 });
         });
+    });
+};
+
+/**
+ * Initialise action to add a new rule.
+ */
+const initRuleAdd = () => {
+    // Add listener to the click event that will load the form.
+    document.querySelector(SELECTORS.RULE_ADD).addEventListener('click', (e) => {
+        e.preventDefault();
+        const modalForm= getRuleForm(0, 'add');
+        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
+            sendFeedback('add');
+            sendWarning();
+            DynamicTable.refreshTableContent(getTableRoot())
+                .catch(Notification.exception);
+        });
+
+        modalForm.show();
+    });
+};
+
+/**
+ * Initialise action to edit rule in modal form.
+ *
+ * @param {Element} root
+ */
+const initRuleEdit = (root) => {
+    root.querySelectorAll(SELECTORS.RULE_EDIT).forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            let ruleid = link.dataset.ruleid;
+
+            const modalForm= getRuleForm(ruleid, 'edit');
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
+                sendFeedback('update');
+                sendWarning();
+                DynamicTable.refreshTableContent(getTableRoot())
+                    .catch(Notification.exception);
+            });
+
+            modalForm.show();
+        });
+    });
+};
+
+/**
+ * Get rule modal form.
+ *
+ * @param {string} ruleid
+ * @param {string} action
+ * @returns {ModalForm}
+ */
+const getRuleForm = (ruleid, action) => {
+    return new ModalForm({
+        formClass: "tool_dynamic_cohorts\\rule_form",
+        args: {id: ruleid},
+        modalConfig: {title: getString(action + '_rule', 'tool_dynamic_cohorts')},
     });
 };
