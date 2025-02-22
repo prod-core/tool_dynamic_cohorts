@@ -44,4 +44,9 @@ $definitions = [
             'conditionschanged',
         ],
     ],
+    'matchinguserscount' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simpledata' => true,
+        'staticacceleration' => true,
+    ],
 ];

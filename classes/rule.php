@@ -189,5 +189,6 @@ class rule extends persistent {
      */
     protected function after_update($result) {
         cache_helper::purge_by_event('ruleschanged');
+        cache::make('tool_dynamic_cohorts', 'matchinguserscount')->delete($this->get('id'));
     }
 }
