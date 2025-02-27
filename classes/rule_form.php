@@ -16,8 +16,13 @@
 
 namespace tool_dynamic_cohorts;
 
+use core_form\dynamic_form;
 use html_writer;
 use moodle_url;
+use context;
+use context_system;
+use dml_missing_record_exception;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,7 +36,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright   2024 Catalyst IT
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class rule_form extends \moodleform {
+class rule_form extends dynamic_form {
 
     /**
      * Form definition.
@@ -47,7 +52,7 @@ class rule_form extends \moodleform {
 
         $mform->addElement('text', 'name', get_string('name', 'tool_dynamic_cohorts'), 'size="50"');
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', get_string('required'), 'required');
+        $mform->addRule('name', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('name', 'name', 'tool_dynamic_cohorts');
 
         $mform->addElement(
@@ -67,7 +72,7 @@ class rule_form extends \moodleform {
             ['noselectionstring' => get_string('choosedots')]
         );
         $mform->addHelpButton('cohortid', 'cohortid', 'tool_dynamic_cohorts');
-        $mform->addRule('cohortid', get_string('required'), 'required');
+        $mform->addRule('cohortid', get_string('required'), 'required', null, 'client');
 
         $link = html_writer::link(new moodle_url('/cohort/index.php'), get_string('managecohorts', 'tool_dynamic_cohorts'));
         $mform->addElement('static', '', '', $link);
@@ -87,8 +92,13 @@ class rule_form extends \moodleform {
         }
 
         $group = [];
-        $group[] = $mform->createElement('select', 'condition', '', $conditions);
-        $group[] = $mform->createElement('button', 'conditionmodalbutton', get_string('addcondition', 'tool_dynamic_cohorts'));
+        $group[] = $mform->createElement('select', 'condition', '', $conditions, ['id' => 'id_condition']);
+        $group[] = $mform->createElement(
+            'button',
+            'conditionmodalbutton',
+            get_string('addcondition', 'tool_dynamic_cohorts'),
+            ['id' => 'id_conditionmodalbutton']
+        );
         $mform->addGroup($group, 'conditiongroup', get_string('condition', 'tool_dynamic_cohorts'), ' ', false);
 
         $mform->addElement(
@@ -128,7 +138,8 @@ class rule_form extends \moodleform {
         $mform->addHelpButton('operator', 'logical_operator', 'tool_dynamic_cohorts');
         $mform->setType('operator', PARAM_INT);
 
-        $this->add_action_buttons();
+        // Dummy element to be able to add conditions table in definition_after_data.
+        $mform->addElement('static', 'afterconditions', '', '');
     }
 
     /**
@@ -145,8 +156,8 @@ class rule_form extends \moodleform {
         }
 
         // Add the currently selected cohort as it won't be in the list.
-        if (isset($this->_customdata['defaultcohort'])) {
-            $cohort = $this->_customdata['defaultcohort'];
+        $cohort = $this->get_default_cohort();
+        if (!empty($cohort)) {
             $options[$cohort->id] = $cohort->name;
         }
 
@@ -154,10 +165,93 @@ class rule_form extends \moodleform {
     }
 
     /**
+     * Gets default cohort to be set into the form.
+     *
+     * @return stdClass|null
+     */
+    protected function get_default_cohort(): ?stdClass {
+        global $DB;
+
+        $rule = $this->get_rule();
+
+        if (!empty($rule->get('cohortid'))) {
+            return $DB->get_record('cohort', ['id' => $rule->get('cohortid')]);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets rule based on form data.
+     *
+     * @return rule
+     */
+    protected function get_rule(): rule {
+        $ruleid = isset($this->_ajaxformdata['id']) ? (int)$this->_ajaxformdata['id'] : 0;
+
+        if (!empty($ruleid)) {
+            $rule = rule::get_record(['id' => $ruleid]);
+            if (empty($rule)) {
+                throw new dml_missing_record_exception(null);
+            }
+            return $rule;
+        } else {
+            return new rule();
+        }
+    }
+
+    /**
+     * Form context.
+     *
+     * @return context
+     */
+    protected function get_context_for_dynamic_submission(): context {
+        return context_system::instance();
+    }
+
+    /**
+     * Access control.
+     *
+     * @return void
+     */
+    protected function check_access_for_dynamic_submission(): void {
+        require_capability('tool/dynamic_cohorts:manage', $this->get_context_for_dynamic_submission());
+    }
+
+    /**
+     * Process form submission.
+     *
+     * @return void
+     */
+    public function process_dynamic_submission() {
+        rule_manager::process_form($this->get_data());
+    }
+
+    /**
+     * Set data.
+     *
+     * @return void
+     */
+    public function set_data_for_dynamic_submission(): void {
+        $this->set_data(rule_manager::build_data_for_form($this->get_rule()));
+    }
+
+    /**
+     * Form URL
+     *
+     * @return moodle_url
+     */
+    protected function get_page_url_for_dynamic_submission(): moodle_url {
+        return new moodle_url('/admin/tool/dynamic_cohorts/index.php');
+    }
+
+    /**
      * Definition after data is set.
      */
     public function definition_after_data() {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE;
+
+        $PAGE->requires->js_call_amd('tool_dynamic_cohorts/condition_form', 'init');
 
         $mform = $this->_form;
         $conditionjson = $mform->getElementValue('conditionjson');
@@ -170,7 +264,7 @@ class rule_form extends \moodleform {
                 'html',
                 '<div id="conditions">' . $conditions . '</div>'
             ),
-            'buttonar'
+            'afterconditions'
         );
     }
 }

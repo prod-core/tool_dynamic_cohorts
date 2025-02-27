@@ -103,7 +103,6 @@ class rule_manager {
                 ['description' => $description] +
                 ['name' => $name] +
                 ['broken' => $broken];
-            ;
         }
 
         if (!empty($conditions)) {

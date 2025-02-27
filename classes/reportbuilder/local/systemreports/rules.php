@@ -73,7 +73,7 @@ class rules extends system_report {
             ->add_callback(static function($id): string {
                 global $OUTPUT;
 
-                $url = new moodle_url('/admin/tool/dynamic_cohorts/users.php', ['ruleid' => $id]);
+                $url = new moodle_url('/admin/tool/dynamic_cohorts/index.php');
                 return $OUTPUT->render_from_template('tool_dynamic_cohorts/matching_users', [
                     'ruleid' => $id,
                     'url' => $url->out(),
@@ -147,9 +147,9 @@ class rules extends system_report {
      */
     protected function add_actions(): void {
         $this->add_action((new action(
-            new moodle_url('/admin/tool/dynamic_cohorts/toggle.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
+            new moodle_url('/admin/tool/dynamic_cohorts/index.php'),
             new pix_icon('t/hide', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'enable'],
             false,
             new lang_string('enable')
         ))->add_callback(function(\stdClass $row): bool {
@@ -157,9 +157,9 @@ class rules extends system_report {
         }));
 
         $this->add_action((new action(
-            new moodle_url('/admin/tool/dynamic_cohorts/toggle.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
+            new moodle_url('/admin/tool/dynamic_cohorts/index.php'),
             new pix_icon('t/show', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'disable'],
             false,
             new lang_string('disable')
         ))->add_callback(function(\stdClass $row): bool {
@@ -167,17 +167,17 @@ class rules extends system_report {
         }));
 
         $this->add_action((new action(
-            new moodle_url('/admin/tool/dynamic_cohorts/edit.php', ['ruleid' => ':id']),
+            new moodle_url('/admin/tool/dynamic_cohorts/index.php'),
             new pix_icon('t/edit', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-edit', 'data-ruleid' => ':id'],
             false,
             new lang_string('edit')
         )));
 
         $this->add_action((new action(
-            new moodle_url('/admin/tool/dynamic_cohorts/delete.php', ['ruleid' => ':id', 'sesskey' => sesskey()]),
+            new moodle_url('/admin/tool/dynamic_cohorts/index.php'),
             new pix_icon('t/delete', '', 'core'),
-            [],
+            ['class' => 'tool-dynamic-cohorts-rule-delete', 'data-ruleid' => ':id', 'data-action' => 'delete'],
             false,
             new lang_string('delete')
         )));

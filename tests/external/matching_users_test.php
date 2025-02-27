@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright  2024 Catalyst IT
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @runTestsInSeparateProcesses
  * @covers     \tool_dynamic_cohorts\external\matching_users
  */
 class matching_users_test extends externallib_advanced_testcase {

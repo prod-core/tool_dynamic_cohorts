@@ -49,4 +49,20 @@ $functions = [
         'capabilities'    => 'tool/dynamic_cohorts:manage',
         'ajax'            => true,
     ],
+    'tool_dynamic_cohorts_delete_rules' => [
+        'classname'       => 'tool_dynamic_cohorts\external\rules',
+        'methodname'      => 'delete_rules',
+        'description'     => 'Delete provided rules',
+        'type'            => 'write',
+        'capabilities'    => 'tool/dynamic_cohorts:manage',
+        'ajax'            => true,
+    ],
+    'tool_dynamic_cohorts_toggle_rule_status' => [
+        'classname'       => 'tool_dynamic_cohorts\external\rules',
+        'methodname'      => 'toggle_status',
+        'description'     => 'Toggles status for given rule (disable or enable)',
+        'type'            => 'write',
+        'capabilities'    => 'tool/dynamic_cohorts:manage',
+        'ajax'            => true,
+    ],
 ];
