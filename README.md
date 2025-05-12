@@ -67,6 +67,7 @@ Conditions are simple predicates which assert something about a user in the syst
 * User last login (time since a user last logged in).
 * User role (if a user has a role in a given context)
 * User standard profile fields (e.g. first name, last name, username, auth method and etc).
+* User interests (if a user has a specific interest tagged on their profile).
 
 ## Rules
 
