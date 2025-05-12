@@ -175,7 +175,7 @@ class user_profile_interests extends condition_base {
             return false;
         }
 
-        return empty($data['tags']) || empty($data['tags_operator']);
+        return empty($data['tags']) || !in_array($data['tags_operator'], array_keys($this->get_tag_operators()));
     }
 
     /**
