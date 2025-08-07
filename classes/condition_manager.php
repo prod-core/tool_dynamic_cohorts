@@ -30,7 +30,6 @@ use tool_dynamic_cohorts\event\condition_updated;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class condition_manager {
-
     /**
      * Get a list of all exising conditions.
      *
@@ -55,7 +54,7 @@ class condition_manager {
         }
 
         // Sort conditions by name.
-        uasort($instances, function(condition_base $a, condition_base $b) {
+        uasort($instances, function (condition_base $a, condition_base $b) {
             return ($a->get_name() <=> $b->get_name());
         });
 
@@ -216,14 +215,16 @@ class condition_manager {
      *
      * @return \tool_dynamic_cohorts\condition_sql
      */
-    public static function build_sql_data(array $conditions, string $operator = rule_manager::CONDITIONS_OPERATOR_AND,
-                                          ?int $userid = null): condition_sql {
+    public static function build_sql_data(
+        array $conditions,
+        string $operator = rule_manager::CONDITIONS_OPERATOR_AND,
+        ?int $userid = null
+    ): condition_sql {
         $where = '';
         $join = '';
         $params = [];
 
         foreach ($conditions as $condition) {
-
             if (!$condition instanceof condition) {
                 continue;
             }

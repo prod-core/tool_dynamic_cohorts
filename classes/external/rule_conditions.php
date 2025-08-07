@@ -34,7 +34,6 @@ use invalid_parameter_exception;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_conditions extends external_api {
-
     /**
      * Describes the parameters for validate_form webservice.
      *

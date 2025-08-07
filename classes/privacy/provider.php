@@ -22,6 +22,9 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\metadata\provider as metadata_provider;
+use core_privacy\local\request\plugin\provider as plugin_provider;
 
 /**
  * Privacy Subsystem.
@@ -30,11 +33,7 @@ use core_privacy\local\request\writer;
  * @copyright   2024 Catalyst IT
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\request\plugin\provider {
-
-
+class provider implements core_userlist_provider, metadata_provider, plugin_provider {
     /**
      * Return the fields which contain personal data.
      *
@@ -209,10 +208,9 @@ class provider implements \core_privacy\local\metadata\provider,
         if (!$context instanceof \context_system) {
             return;
         }
-        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        [$userinsql, $userinparams] = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
 
         $DB->set_field_select('tool_dynamic_cohorts', 'usermodified', 0, ' usermodified ' . $userinsql, $userinparams);
         $DB->set_field_select('tool_dynamic_cohorts_c', 'usermodified', 0, ' usermodified ' . $userinsql, $userinparams);
     }
-
 }

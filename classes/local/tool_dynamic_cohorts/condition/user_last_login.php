@@ -27,7 +27,6 @@ use tool_dynamic_cohorts\condition_sql;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_last_login extends condition_base {
-
     /**
      * Operator for the condition.
      */
@@ -290,7 +289,7 @@ class user_last_login extends condition_base {
                 return true;
             }
 
-            if (in_array($operator,  [self::OPERATOR_AFTER, self::OPERATOR_BEFORE]) && empty($this->get_time_value())) {
+            if (in_array($operator, [self::OPERATOR_AFTER, self::OPERATOR_BEFORE]) && empty($this->get_time_value())) {
                 return true;
             }
         }

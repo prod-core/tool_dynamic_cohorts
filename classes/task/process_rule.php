@@ -28,7 +28,6 @@ use tool_dynamic_cohorts\rule;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class process_rule extends adhoc_task {
-
     /**
      * Task execution
      */

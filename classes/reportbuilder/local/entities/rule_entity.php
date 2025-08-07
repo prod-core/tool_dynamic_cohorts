@@ -32,7 +32,6 @@ use tool_dynamic_cohorts\rule;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_entity extends base {
-
     /**
      * Returns the default table aliases.
      * @return array

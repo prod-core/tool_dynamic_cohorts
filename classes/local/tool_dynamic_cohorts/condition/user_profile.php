@@ -30,13 +30,12 @@ use coding_exception;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_profile extends condition_base {
-
     use fields_trait;
 
     /**
      * A list of supported default fields.
      */
-    protected const SUPPORTED_STANDARD_FIELDS = ['auth', 'firstname', 'lastname', 'username', 'email',  'idnumber',
+    protected const SUPPORTED_STANDARD_FIELDS = ['auth', 'firstname', 'lastname', 'username', 'email', 'idnumber',
         'city', 'country', 'institution', 'department', 'suspended'];
 
     /**
@@ -86,6 +85,7 @@ class user_profile extends condition_base {
                     break;
                 case self::FIELD_DATA_TYPE_DATE:
                     $this->add_date_field($mform, $group, $field, $shortname);
+                    break;
                 default:
                     throw new coding_exception('Invalid field type ' . $field->datatype);
             }
@@ -144,7 +144,8 @@ class user_profile extends condition_base {
                 case 'suspended':
                     $fields[$field]->name = get_string($field);
                     $fields[$field]->datatype = self::FIELD_DATA_TYPE_CHECKBOX;
-                    $fields[$field]->param1 = array_combine([0, 1], [get_string('no'), get_string('yes')]);;
+                    $fields[$field]->param1 = array_combine([0, 1], [get_string('no'), get_string('yes')]);
+                    ;
                     break;
                 default:
                     $fields[$field]->name = get_string($field);

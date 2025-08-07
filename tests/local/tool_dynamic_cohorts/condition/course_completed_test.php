@@ -28,8 +28,7 @@ use tool_dynamic_cohorts\rule;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\course_completed
  */
-class course_completed_test extends \advanced_testcase {
-
+final class course_completed_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -48,7 +47,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         $formdata = (object)[
             'courseid' => 1,
             'operator' => 3,
@@ -69,7 +68,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $condition = $this->get_condition([
             'courseid' => 1,
             'operator' => 3,
@@ -89,7 +88,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test getting config description.
      */
-    public function test_config_description() {
+    public function test_config_description(): void {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
@@ -132,7 +131,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test getting rule.
      */
-    public function test_get_rule() {
+    public function test_get_rule(): void {
         $this->resetAfterTest();
 
         // Rule is not set.
@@ -150,7 +149,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test is broken.
      */
-    public function test_is_broken_and_broken_description() {
+    public function test_is_broken_and_broken_description(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -194,7 +193,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test getting correct SQL.
      */
-    public function test_get_sql_data() {
+    public function test_get_sql_data(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -260,7 +259,7 @@ class course_completed_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([], $this->get_condition()->get_events());
     }
 }

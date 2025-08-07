@@ -28,7 +28,6 @@ use core_plugin_manager;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class auth_method extends user_profile {
-
     /**
      * Return field name in the condition config form.
      *

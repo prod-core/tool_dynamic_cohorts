@@ -33,7 +33,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class condition_form extends moodleform {
-
     /**
      * Form definition.
      */
@@ -81,5 +80,4 @@ class condition_form extends moodleform {
 
         return array_merge($errors, $this->get_condition()->config_form_validate($data));
     }
-
 }

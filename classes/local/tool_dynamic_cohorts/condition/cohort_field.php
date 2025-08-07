@@ -36,7 +36,7 @@ class cohort_field extends condition_base {
     /**
      * Supported fields from 'cohort' table.
      */
-    public const SUPPORTED_STANDARD_FIELDS = ['contextid', 'name', 'idnumber', 'visible', 'component',  'theme'];
+    public const SUPPORTED_STANDARD_FIELDS = ['contextid', 'name', 'idnumber', 'visible', 'component', 'theme'];
 
     /**
      * Custom field prefix.
@@ -134,7 +134,6 @@ class cohort_field extends condition_base {
             $handler = \core_cohort\customfield\cohort_handler::create();
 
             foreach ($handler->get_fields() as $customfield) {
-
                 if (!in_array($customfield->get('type'), $this->get_supported_custom_fields())) {
                     continue;
                 }
@@ -268,7 +267,7 @@ class cohort_field extends condition_base {
 
         // Only get required values related to the selected configuration.
         foreach ($configdata as $key => $value) {
-            if ( $key == self::get_cohort_operator_field() || strpos($key, $fieldname . '_') === 0 ) {
+            if ($key == self::get_cohort_operator_field() || strpos($key, $fieldname . '_') === 0) {
                 $data[$key] = $value;
             }
         }
@@ -474,7 +473,6 @@ class cohort_field extends condition_base {
      */
     public function is_broken(): bool {
         if ($this->get_config_data()) {
-
             $configuredfield = $this->get_field_name();
             $fieldvalue = $this->get_field_value();
             $operatorvalue = $this->get_operator_value();

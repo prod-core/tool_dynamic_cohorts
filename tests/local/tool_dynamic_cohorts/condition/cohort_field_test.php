@@ -28,8 +28,7 @@ use tool_dynamic_cohorts\rule;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\cohort_field
  */
-class cohort_field_test extends \advanced_testcase {
-
+final class cohort_field_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -48,7 +47,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         $formdata = (object)[
             'id' => 1,
             'cohort_field_operator' => 2,
@@ -70,7 +69,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $instance = $this->get_condition([
             'cohort_field_operator' => 2,
             'cohort_field_field' => 'visible',
@@ -79,7 +78,7 @@ class cohort_field_test extends \advanced_testcase {
         ]);
 
         $this->assertEquals(
-            ['cohort_field_field' => 'visible',  'cohort_field_operator' => 2,  'visible_operator' => 3, 'visible_value' => 0],
+            ['cohort_field_field' => 'visible', 'cohort_field_operator' => 2, 'visible_operator' => 3, 'visible_value' => 0],
             $instance->get_config_data()
         );
     }
@@ -112,7 +111,7 @@ class cohort_field_test extends \advanced_testcase {
      * @param int $operator
      * @param string $expected
      */
-    public function test_config_description(int $operator, string $expected) {
+    public function test_config_description(int $operator, string $expected): void {
         $condition = $this->get_condition([
             'cohort_field_operator' => cohort_field::OPERATOR_IS_NOT_MEMBER_OF,
             'cohort_field_field' => 'theme',
@@ -126,7 +125,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test getting config description.
      */
-    public function test_config_description_context_id() {
+    public function test_config_description_context_id(): void {
         $this->resetAfterTest();
 
         $coursecategory = $this->getDataGenerator()->create_category();
@@ -148,7 +147,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test getting rule.
      */
-    public function test_get_rule() {
+    public function test_get_rule(): void {
         $this->resetAfterTest();
 
         // Rule is not set.
@@ -166,7 +165,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test is broken.
      */
-    public function test_is_broken() {
+    public function test_is_broken(): void {
         $condition = $this->get_condition();
 
         // Not configured should be always valid.
@@ -217,7 +216,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test getting SQL.
      */
-    public function test_get_sql_data_standard_fields() {
+    public function test_get_sql_data_standard_fields(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -284,8 +283,10 @@ class cohort_field_test extends \advanced_testcase {
      *
      * @return \core_customfield\field_controller
      */
-    protected function create_cohort_custom_field(string $shortname = 'testfield1',
-                                                  string $datatype = 'text'): \core_customfield\field_controller {
+    protected function create_cohort_custom_field(
+        string $shortname = 'testfield1',
+        string $datatype = 'text'
+    ): \core_customfield\field_controller {
         $fieldcategory = self::getDataGenerator()->create_custom_field_category([
             'component' => 'core_cohort',
             'area' => 'cohort',
@@ -303,7 +304,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test getting config description when using a custom field.
      */
-    public function test_config_description_custom_field() {
+    public function test_config_description_custom_field(): void {
         if (!class_exists(\core_cohort\customfield\cohort_handler::class)) {
             $this->markTestSkipped();
         }
@@ -380,7 +381,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test getting SQL.
      */
-    public function test_get_sql_data_custom_fields() {
+    public function test_get_sql_data_custom_fields(): void {
         global $DB;
 
         if (!class_exists(\core_cohort\customfield\cohort_handler::class)) {
@@ -530,7 +531,7 @@ class cohort_field_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([
             '\core\event\cohort_member_added',
             '\core\event\cohort_member_removed',

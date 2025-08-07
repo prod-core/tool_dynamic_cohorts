@@ -33,7 +33,6 @@ use tool_dynamic_cohorts\condition_form as form;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class condition_form extends external_api {
-
     /**
      * Describes the parameters for validate_form webservice.
      * @return external_function_parameters
@@ -53,8 +52,10 @@ class condition_form extends external_api {
      * @return array
      */
     public static function submit(string $classname, string $jsonformdata): array {
-        $params = self::validate_parameters(self::submit_parameters(),
-            ['classname' => $classname, 'jsonformdata' => $jsonformdata]);
+        $params = self::validate_parameters(
+            self::submit_parameters(),
+            ['classname' => $classname, 'jsonformdata' => $jsonformdata]
+        );
 
         // Always in a system context.
         self::validate_context(context_system::instance());
@@ -101,5 +102,4 @@ class condition_form extends external_api {
             'name' => new external_value(PARAM_RAW, ''),
         ]);
     }
-
 }

@@ -37,8 +37,7 @@ use tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile;
  *
  * @covers     \tool_dynamic_cohorts\rule_manager
  */
-class rule_manager_test extends \advanced_testcase {
-
+final class rule_manager_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -56,7 +55,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test building edit URL.
      */
-    public function test_build_edit_url() {
+    public function test_build_edit_url(): void {
         $this->resetAfterTest();
 
         $data = ['name' => 'Test', 'enabled' => 1, 'cohortid' => 2, 'description' => ''];
@@ -71,7 +70,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test delete URL.
      */
-    public function test_build_rule_delete_url() {
+    public function test_build_rule_delete_url(): void {
         $this->resetAfterTest();
 
         $data = ['name' => 'Test', 'enabled' => 1, 'cohortid' => 2, 'description' => ''];
@@ -90,7 +89,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test building rule data for form.
      */
-    public function test_build_rule_data_for_form() {
+    public function test_build_rule_data_for_form(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule', 'cohortid' => 0, 'description' => 'Test description']);
@@ -160,7 +159,7 @@ class rule_manager_test extends \advanced_testcase {
      * @dataProvider process_rule_form_with_invalid_data_provider
      * @param array $formdata Broken form data
      */
-    public function test_process_rule_form_with_invalid_data(array $formdata) {
+    public function test_process_rule_form_with_invalid_data(array $formdata): void {
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid rule data');
 
@@ -170,7 +169,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test new rules are created when processing form data.
      */
-    public function test_process_rule_form_new_rule() {
+    public function test_process_rule_form_new_rule(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -219,7 +218,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test existing rules are updated when processing form data.
      */
-    public function test_process_rule_form_existing_rule() {
+    public function test_process_rule_form_existing_rule(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -253,7 +252,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test trying to submit form data and sending not existing cohort.
      */
-    public function test_process_rule_form_with_not_existing_cohort() {
+    public function test_process_rule_form_with_not_existing_cohort(): void {
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid rule data. Cohort is invalid: 999');
 
@@ -265,7 +264,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test trying to submit form data and sending a cohort taken by other component.
      */
-    public function test_process_rule_form_with_cohort_managed_by_other_component() {
+    public function test_process_rule_form_with_cohort_managed_by_other_component(): void {
         $this->resetAfterTest();
 
         $cohort = $this->getDataGenerator()->create_cohort(['component' => 'mod_assign']);
@@ -280,7 +279,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test trying to submit form data and sending a cohort taken by other rule.
      */
-    public function test_process_rule_form_with_cohort_managed_by_another_rule() {
+    public function test_process_rule_form_with_cohort_managed_by_another_rule(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -303,7 +302,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test submitting form data keeps cohort.
      */
-    public function test_process_rule_form_update_rule_form_keeping_cohort() {
+    public function test_process_rule_form_update_rule_form_keeping_cohort(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -327,7 +326,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test triggering events.
      */
-    public function test_process_rule_form_triggers_events() {
+    public function test_process_rule_form_triggers_events(): void {
         $this->resetAfterTest();
 
         $cohort = $this->getDataGenerator()->create_cohort();
@@ -363,7 +362,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test trying to submit form data and sending a cohort taken by other component.
      */
-    public function test_process_rule_form_without_condition_data() {
+    public function test_process_rule_form_without_condition_data(): void {
         $this->resetAfterTest();
 
         $cohort = $this->getDataGenerator()->create_cohort(['component' => 'tool_dynamic_cohorts']);
@@ -378,7 +377,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test conditions created when processing rule form data.
      */
-    public function test_process_rule_form_with_conditions() {
+    public function test_process_rule_form_with_conditions(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -483,7 +482,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test rule deleting clear all related tables.
      */
-    public function test_deleting_rule_deletes_all_related_records() {
+    public function test_deleting_rule_deletes_all_related_records(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -510,7 +509,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test cohorts are getting released after related rules are deleted.
      */
-    public function test_deleting_rule_releases_cohorts() {
+    public function test_deleting_rule_releases_cohorts(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -541,7 +540,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test deleting a rule triggers event.
      */
-    public function test_deleting_rule_triggers_event() {
+    public function test_deleting_rule_triggers_event(): void {
         $this->resetAfterTest();
 
         $cohort = $this->getDataGenerator()->create_cohort(['component' => 'tool_dynamic_cohorts']);
@@ -565,7 +564,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Basic test for get matching users to make sure it all works.
      */
-    public function test_get_matching_users() {
+    public function test_get_matching_users(): void {
         $this->resetAfterTest();
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'user1username']);
@@ -597,7 +596,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Basic test for get matching users with or logic to make sure it all works.
      */
-    public function test_get_matching_users_or_logic() {
+    public function test_get_matching_users_or_logic(): void {
         $this->resetAfterTest();
 
         $this->getDataGenerator()->create_user(['username' => 'user1username']);
@@ -631,7 +630,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test rule processing.
      */
-    public function test_rule_processing() {
+    public function test_rule_processing(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -754,7 +753,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test rule processing in bulk.
      */
-    public function test_rule_processing_with_bulk_processing_enabled() {
+    public function test_rule_processing_with_bulk_processing_enabled(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -876,7 +875,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test getting rules with condition.
      */
-    public function test_get_rules_with_condition() {
+    public function test_get_rules_with_condition(): void {
         $this->resetAfterTest();
 
         $rule1 = new rule(0, (object)['name' => 'Test rule1 1', 'enabled' => 1]);
@@ -892,7 +891,7 @@ class rule_manager_test extends \advanced_testcase {
         $cache = cache::make('tool_dynamic_cohorts', 'rulesconditions');
         $key = $classname;
 
-        $this->assertFalse( $cache->get($key));
+        $this->assertFalse($cache->get($key));
 
         $condition1 = $this->get_condition($classname);
         $record1 = $condition1->get_record();
@@ -939,7 +938,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Testing logical operator text.
      */
-    public function test_get_logical_operator_text() {
+    public function test_get_logical_operator_text(): void {
         $this->assertSame('AND', rule_manager::get_logical_operator_text(0));
         $this->assertSame('OR', rule_manager::get_logical_operator_text(rand(1, 1000)));
     }
@@ -947,7 +946,7 @@ class rule_manager_test extends \advanced_testcase {
     /**
      * Test that a list of matching users is cached.
      */
-    public function test_matching_users_get_cached() {
+    public function test_matching_users_get_cached(): void {
         $this->resetAfterTest();
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'user1username']);

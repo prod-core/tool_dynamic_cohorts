@@ -28,12 +28,11 @@ use cache;
  * @covers     \tool_dynamic_cohorts\rule
 
  */
-class rule_test extends \advanced_testcase {
-
+final class rule_test extends \advanced_testcase {
     /**
      * Test is_enabled.
      */
-    public function test_is_enabled() {
+    public function test_is_enabled(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule disabled']);
@@ -46,7 +45,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test is_bulk_processing.
      */
-    public function test_is_bulk_processing() {
+    public function test_is_bulk_processing(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule bulk processing', 'bulkprocessing' => 1]);
@@ -59,7 +58,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test getting a list of related condition records.
      */
-    public function test_get_condition_records() {
+    public function test_get_condition_records(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule with conditions']);
@@ -82,7 +81,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test cache for condition records.
      */
-    public function test_condition_records_get_cached() {
+    public function test_condition_records_get_cached(): void {
         $this->resetAfterTest();
 
         $cache = cache::make('tool_dynamic_cohorts', 'conditionrecords');
@@ -121,7 +120,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test is_broken.
      */
-    public function test_is_broken() {
+    public function test_is_broken(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule broken', 'broken' => 1]);
@@ -134,7 +133,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test is_broken when checking conditions.
      */
-    public function test_is_broken_check_conditions() {
+    public function test_is_broken_check_conditions(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule 1']);
@@ -150,7 +149,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test marking a rule broken and unbroken.
      */
-    public function test_mark_broken_and_unbroken() {
+    public function test_mark_broken_and_unbroken(): void {
         $this->resetAfterTest();
 
         $rule = new rule(0, (object)['name' => 'Test rule 2', 'broken' => 0, 'enabled' => 1]);
@@ -169,7 +168,7 @@ class rule_test extends \advanced_testcase {
     /**
      * Test updating rule invalidates matching users count cache.
      */
-    public function test_updating_rule_invalidates_matchinguserscount_cache() {
+    public function test_updating_rule_invalidates_matchinguserscount_cache(): void {
         $this->resetAfterTest();
         $rule = new rule(0, (object)['name' => 'Test rule 1', 'broken' => 0, 'enabled' => 1]);
         $rule->save();

@@ -28,7 +28,6 @@ use core\persistent;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule extends persistent {
-
     /**
      * Table.
      */

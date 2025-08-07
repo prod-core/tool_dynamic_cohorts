@@ -29,12 +29,11 @@ use tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \tool_dynamic_cohorts\condition_manager
  */
-class condition_manager_test extends \advanced_testcase {
-
+final class condition_manager_test extends \advanced_testcase {
     /**
      * Test all conditions.
      */
-    public function test_get_all_conditions() {
+    public function test_get_all_conditions(): void {
         $conditions = condition_manager::get_all_conditions();
         $this->assertIsArray($conditions);
         $this->assertNotEmpty($conditions);
@@ -49,7 +48,7 @@ class condition_manager_test extends \advanced_testcase {
     /**
      * Test processing condition form
      */
-    public function test_process_form() {
+    public function test_process_form(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -165,7 +164,7 @@ class condition_manager_test extends \advanced_testcase {
     /**
      * Test delete_conditions.
      */
-    public function test_delete_conditions() {
+    public function test_delete_conditions(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -200,7 +199,7 @@ class condition_manager_test extends \advanced_testcase {
     /**
      * Test getting conditions for a given event.
      */
-    public function test_get_conditions_with_event() {
+    public function test_get_conditions_with_event(): void {
         $this->resetAfterTest();
 
         $user = $this->getDataGenerator()->create_user();
@@ -215,7 +214,7 @@ class condition_manager_test extends \advanced_testcase {
     /**
      * Basic test of building SQL data.
      */
-    public function test_build_sql_data() {
+    public function test_build_sql_data(): void {
         $this->resetAfterTest();
 
         $this->getDataGenerator()->create_user(['username' => 'user1username']);
@@ -279,7 +278,7 @@ class condition_manager_test extends \advanced_testcase {
     /**
      * Test that generated SQL should exclude deleted users.
      */
-    public function test_should_exclude_deleted_users() {
+    public function test_should_exclude_deleted_users(): void {
         global $DB;
 
         $this->resetAfterTest();

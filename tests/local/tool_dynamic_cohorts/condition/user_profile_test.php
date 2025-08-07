@@ -27,8 +27,7 @@ use tool_dynamic_cohorts\condition_base;
  *
  * @covers \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile
  */
-class user_profile_test extends \advanced_testcase {
-
+final class user_profile_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -47,7 +46,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         $formdata = (object)[
             'id' => 1,
             'profilefield' => 'firstname',
@@ -70,7 +69,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $instance = $this->get_condition([
             'profilefield' => 'firstname',
             'firstname_operator' => 3,
@@ -78,7 +77,7 @@ class user_profile_test extends \advanced_testcase {
         ]);
 
         $this->assertEquals(
-            ['profilefield' => 'firstname',  'firstname_operator' => 3,  'firstname_value' => 123],
+            ['profilefield' => 'firstname', 'firstname_operator' => 3, 'firstname_value' => 123],
             $instance->get_config_data()
         );
     }
@@ -108,7 +107,7 @@ class user_profile_test extends \advanced_testcase {
      * @param int $operator
      * @param string $expected
      */
-    public function test_config_description(int $operator, string $expected) {
+    public function test_config_description(int $operator, string $expected): void {
         $instance = $this->get_condition([
             'profilefield' => 'firstname',
             'firstname_operator' => $operator,
@@ -121,7 +120,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test getting config description.
      */
-    public function test_config_description_for_auth_field() {
+    public function test_config_description_for_auth_field(): void {
         $instance = $this->get_condition([
             'profilefield' => 'auth',
             'auth_operator' => condition_base::TEXT_IS_EQUAL_TO,
@@ -134,7 +133,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_get_sql_data() {
+    public function test_get_sql_data(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -208,7 +207,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([
             '\core\event\user_created',
             '\core\event\user_updated',
@@ -218,7 +217,7 @@ class user_profile_test extends \advanced_testcase {
     /**
      * Test is broken.
      */
-    public function test_is_broken() {
+    public function test_is_broken(): void {
         $condition = $this->get_condition();
 
         // Not configured should be always valid.

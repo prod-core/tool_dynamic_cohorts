@@ -34,7 +34,6 @@ use core\event\base;
   * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
   */
 class condition_updated extends base {
-
     /**
      * Initialise the rule data.
      */
@@ -88,5 +87,4 @@ class condition_updated extends base {
             throw new \coding_exception('The \'olddescription\' value must be set in other.');
         }
     }
-
 }

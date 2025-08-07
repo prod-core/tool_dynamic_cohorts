@@ -24,7 +24,6 @@ namespace tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_created extends user_last_login {
-
     /**
      * Condition name.
      *

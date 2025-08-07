@@ -29,7 +29,7 @@ use tool_dynamic_cohorts\condition_base;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile_interests
  */
-class user_profile_interests_test extends \advanced_testcase {
+final class user_profile_interests_test extends \advanced_testcase {
     /**
      * Set up the test case.
      */
@@ -100,7 +100,7 @@ class user_profile_interests_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $tags = $this->create_tags();
         $cats = $tags['Cats']->id;
         $horses = $tags['Horses']->id;
@@ -133,7 +133,10 @@ class user_profile_interests_test extends \advanced_testcase {
             'tags_operator' => condition_base::TEXT_DOES_NOT_CONTAIN,
             'tags' => [$tags['Horses']->id],
         ]);
-        $this->assertEquals(0, strpos($condition->get_config_description(), 'Users with interests not containing the following tags '));
+        $this->assertEquals(
+            0,
+            strpos($condition->get_config_description(), 'Users with interests not containing the following tags ')
+        );
         $this->assertStringContainsString('Horses', $condition->get_config_description());
         $this->assertStringNotContainsString('Dogs', $condition->get_config_description());
     }

@@ -27,7 +27,6 @@ use tool_dynamic_cohorts\condition_sql;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_custom_profile extends user_profile {
-
     /**
      * Field name to store include missing data option,
      */
@@ -70,7 +69,7 @@ class user_custom_profile extends user_profile {
     protected function get_fields_info(): array {
         global $CFG;
 
-        require_once($CFG->dirroot.'/user/profile/lib.php');
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         $fields = [];
 
@@ -79,8 +78,10 @@ class user_custom_profile extends user_profile {
                 continue;
             }
 
-            $field = (object)array_intersect_key((array)$customfield->field,
-                ['shortname' => 1, 'name' => 1, 'datatype' => 1, 'param1' => 1]);
+            $field = (object)array_intersect_key(
+                (array)$customfield->field,
+                ['shortname' => 1, 'name' => 1, 'datatype' => 1, 'param1' => 1]
+            );
 
             switch ($field->datatype) {
                 case self::FIELD_DATA_TYPE_MENU:

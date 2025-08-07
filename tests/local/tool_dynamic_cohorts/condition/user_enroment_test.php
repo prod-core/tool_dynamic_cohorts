@@ -29,8 +29,7 @@ use tool_dynamic_cohorts\condition_base;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_enrolment
  */
-class user_enroment_test extends \advanced_testcase {
-
+final class user_enroment_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -49,7 +48,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         $formdata = (object)[
             'operator' => 1,
             'roleid' => 1,
@@ -71,7 +70,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $condition = $this->get_condition([
             'operator' => 1,
             'roleid' => 1,
@@ -93,7 +92,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test getting config description.
      */
-    public function test_config_description() {
+    public function test_config_description(): void {
         $this->resetAfterTest();
 
         $roleid = $this->getDataGenerator()->create_role();
@@ -106,7 +105,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "Any" role using "Any" enrolment method',
             $condition->get_config_description(),
         );
@@ -117,7 +116,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "Any" role using "Any" enrolment method',
             $condition->get_config_description(),
         );
@@ -129,7 +128,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "Any" role using "Manual enrolments" enrolment method',
             $condition->get_config_description(),
         );
@@ -141,7 +140,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "Any" role using "Manual enrolments" enrolment method',
             $condition->get_config_description(),
         );
@@ -155,7 +154,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "' . $roles[$roleid]->name . '" role using "Manual enrolments" enrolment method',
             $condition->get_config_description(),
         );
@@ -168,7 +167,7 @@ class user_enroment_test extends \advanced_testcase {
         ]);
 
         $this->assertSame(
-            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id .')'
+            'Users who are not enrolled into course "' . $course->fullname . '" (id ' . $course->id . ')'
             . ' with "' . $roles[$roleid]->name . '" role using "Manual enrolments" enrolment method',
             $condition->get_config_description(),
         );
@@ -177,7 +176,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test is broken and description.
      */
-    public function test_is_broken_and_broken_description() {
+    public function test_is_broken_and_broken_description(): void {
         $this->resetAfterTest();
 
         $roleid = $this->getDataGenerator()->create_role();
@@ -244,7 +243,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test getting correct SQL when operator "enrolled".
      */
-    public function test_get_sql_data_operator_enrolled() {
+    public function test_get_sql_data_operator_enrolled(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -416,7 +415,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test getting correct SQL when operator "not enrolled".
      */
-    public function test_get_sql_data_operator_not_enrolled() {
+    public function test_get_sql_data_operator_not_enrolled(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -580,7 +579,7 @@ class user_enroment_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([
             'core\event\role_assigned',
             'core\event\role_unassigned',

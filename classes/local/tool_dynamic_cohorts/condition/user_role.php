@@ -31,7 +31,6 @@ use context_coursecat;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_role extends condition_base {
-
     /**
      * Operator for user who have role.
      */
@@ -257,14 +256,18 @@ class user_role extends condition_base {
         }
 
         // Missing course.
-        if ($this->get_contextlevel_value() == CONTEXT_COURSE &&
-            !$DB->get_record('course', ['id' => $this->get_courseid_value()])) {
+        if (
+            $this->get_contextlevel_value() == CONTEXT_COURSE &&
+            !$DB->get_record('course', ['id' => $this->get_courseid_value()])
+        ) {
             return get_string('missingcourse', 'tool_dynamic_cohorts');
         }
 
         // Missing course category.
-        if ($this->get_contextlevel_value() == CONTEXT_COURSECAT &&
-            !$DB->get_record('course_categories', ['id' => $this->get_categoryid_value()])) {
+        if (
+            $this->get_contextlevel_value() == CONTEXT_COURSECAT &&
+            !$DB->get_record('course_categories', ['id' => $this->get_categoryid_value()])
+        ) {
             return get_string('missingcoursecat', 'tool_dynamic_cohorts');
         }
 
@@ -300,7 +303,7 @@ class user_role extends condition_base {
                     break;
                 case CONTEXT_COURSECAT:
                     $context = context_coursecat::instance($this->get_categoryid_value());
-                    list($parentcontexsql, $parentcparams) = $DB->get_in_or_equal(
+                    [$parentcontexsql, $parentcparams] = $DB->get_in_or_equal(
                         $context->get_parent_context_ids(true),
                         SQL_PARAMS_NAMED,
                         condition_sql::generate_param_alias()
@@ -311,7 +314,7 @@ class user_role extends condition_base {
 
                     if ($this->get_includechildren_value() && !empty($childcontxtids)) {
                         $childcontxtids = array_keys($context->get_child_contexts());
-                        list($childcontextsql, $childcparams) = $DB->get_in_or_equal(
+                        [$childcontextsql, $childcparams] = $DB->get_in_or_equal(
                             $childcontxtids,
                             SQL_PARAMS_NAMED,
                             condition_sql::generate_param_alias()
@@ -327,7 +330,7 @@ class user_role extends condition_base {
                 case CONTEXT_COURSE:
                     $context = context_course::instance($this->get_courseid_value());
 
-                    list($contextsql, $cparams) = $DB->get_in_or_equal(
+                    [$contextsql, $cparams] = $DB->get_in_or_equal(
                         $context->get_parent_context_ids(true),
                         SQL_PARAMS_NAMED,
                         condition_sql::generate_param_alias()
@@ -370,14 +373,18 @@ class user_role extends condition_base {
             }
 
             // Check course exists.
-            if ($this->get_contextlevel_value() == CONTEXT_COURSE &&
-                !$DB->get_record('course', ['id' => $this->get_courseid_value()])) {
+            if (
+                $this->get_contextlevel_value() == CONTEXT_COURSE &&
+                !$DB->get_record('course', ['id' => $this->get_courseid_value()])
+            ) {
                 return true;
             }
 
             // Check category exists.
-            if ($this->get_contextlevel_value() == CONTEXT_COURSECAT &&
-                !$DB->get_record('course_categories', ['id' => $this->get_categoryid_value()])) {
+            if (
+                $this->get_contextlevel_value() == CONTEXT_COURSECAT &&
+                !$DB->get_record('course_categories', ['id' => $this->get_categoryid_value()])
+            ) {
                 return true;
             }
         }

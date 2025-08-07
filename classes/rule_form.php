@@ -37,7 +37,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_form extends dynamic_form {
-
     /**
      * Form definition.
      */
@@ -131,10 +130,12 @@ class rule_form extends dynamic_form {
             $mform->addElement('static', 'realtimeglobal', '', $realtimeglobal);
         }
 
-        $mform->addElement('select',
+        $mform->addElement(
+            'select',
             'operator',
             get_string('logical_operator', 'tool_dynamic_cohorts'),
-            [rule_manager::CONDITIONS_OPERATOR_AND => 'AND', rule_manager::CONDITIONS_OPERATOR_OR => 'OR']);
+            [rule_manager::CONDITIONS_OPERATOR_AND => 'AND', rule_manager::CONDITIONS_OPERATOR_OR => 'OR']
+        );
         $mform->addHelpButton('operator', 'logical_operator', 'tool_dynamic_cohorts');
         $mform->setType('operator', PARAM_INT);
 

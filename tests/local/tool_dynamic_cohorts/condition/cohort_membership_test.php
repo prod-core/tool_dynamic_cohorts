@@ -28,8 +28,7 @@ use tool_dynamic_cohorts\rule;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\cohort_membership
  */
-class cohort_membership_test extends \advanced_testcase {
-
+final class cohort_membership_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -48,7 +47,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test class constants.
      */
-    public function test_constants() {
+    public function test_constants(): void {
         $this->assertSame('cohort_membership', cohort_membership::FIELD_NAME);
         $this->assertSame(1, cohort_membership::OPERATOR_IS_MEMBER_OF);
         $this->assertSame(2, cohort_membership::OPERATOR_IS_NOT_MEMBER_OF);
@@ -57,7 +56,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         $formdata = (object)[
             'id' => 1,
             'cohort_membership_operator' => 3,
@@ -77,14 +76,14 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         $condition = $this->get_condition([
             'cohort_membership_operator' => 3,
             'cohort_membership_value' => 123,
         ]);
 
         $this->assertEquals(
-            ['cohort_membership_operator' => 3,  'cohort_membership_value' => 123],
+            ['cohort_membership_operator' => 3, 'cohort_membership_value' => 123],
             $condition->get_config_data()
         );
     }
@@ -92,7 +91,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test getting config description.
      */
-    public function test_config_description() {
+    public function test_config_description(): void {
         $this->resetAfterTest();
 
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -126,7 +125,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test getting rule.
      */
-    public function test_get_rule() {
+    public function test_get_rule(): void {
         $this->resetAfterTest();
 
         // Rule is not set.
@@ -144,7 +143,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test is broken.
      */
-    public function test_is_broken() {
+    public function test_is_broken(): void {
         $this->resetAfterTest();
 
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -189,7 +188,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test getting broken description.
      */
-    public function test_get_broken_description() {
+    public function test_get_broken_description(): void {
         $this->resetAfterTest();
 
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -226,7 +225,7 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_get_sql_data() {
+    public function test_get_sql_data(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -300,11 +299,10 @@ class cohort_membership_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([
             '\core\event\cohort_member_added',
             '\core\event\cohort_member_removed',
         ], $this->get_condition()->get_events());
     }
-
 }
