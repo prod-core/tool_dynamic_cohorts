@@ -943,4 +943,51 @@ class rule_manager_test extends \advanced_testcase {
         $this->assertSame('AND', rule_manager::get_logical_operator_text(0));
         $this->assertSame('OR', rule_manager::get_logical_operator_text(rand(1, 1000)));
     }
+
+    /**
+     * Test that a list of matching users is cached.
+     */
+    public function test_matching_users_get_cached() {
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1username']);
+        $user2 = $this->getDataGenerator()->create_user(['username' => 'user2username']);
+        $user3 = $this->getDataGenerator()->create_user(['username' => 'test']);
+
+        $cohort = $this->getDataGenerator()->create_cohort();
+
+        $rule = new rule(0, (object)['name' => 'Test rule 1', 'cohortid' => $cohort->id]);
+        $rule->save();
+
+        $condition = user_profile::get_instance(0, (object)['ruleid' => $rule->get('id'), 'sortorder' => 1]);
+        $condition->set_config_data([
+            'profilefield' => 'username',
+            'username_operator' => condition_base::TEXT_IS_EQUAL_TO,
+            'username_value' => 'user1username',
+        ]);
+        $condition->get_record()->save();
+
+        $cache = cache::make('tool_dynamic_cohorts', 'matchinguserscount');
+
+        // Empty cache initially.
+        $this->assertFalse($cache->get($rule->get('id')));
+
+        $users = rule_manager::get_matching_users($rule);
+        $this->assertEquals(1, rule_manager::get_matching_users_count($rule));
+
+        $this->assertArrayHasKey($user1->id, $users);
+        $this->assertArrayNotHasKey($user2->id, $users);
+        $this->assertArrayNotHasKey($user3->id, $users);
+
+        // Should be only one matching user and the count value should be cached.
+        $this->assertSame(1, $cache->get($rule->get('id')));
+
+        // Hack into the cached value and check if cached result is returned.
+        $cache->set($rule->get('id'), 50);
+        $this->assertEquals(50, rule_manager::get_matching_users_count($rule));
+
+        // Get the users again and check that cache is reset.
+        rule_manager::get_matching_users($rule);
+        $this->assertSame(1, $cache->get($rule->get('id')));
+    }
 }

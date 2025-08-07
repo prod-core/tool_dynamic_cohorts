@@ -225,9 +225,11 @@ class rule_manager {
     public static function get_matching_users(rule $rule, ?int $userid = null): array {
         global $DB;
 
-        $conditions = $rule->get_condition_records();
+        $matchinguserscache = cache::make('tool_dynamic_cohorts', 'matchinguserscount');
 
+        $conditions = $rule->get_condition_records();
         if (empty($conditions)) {
+            $matchinguserscache->set($rule->get('id'), 0);
             return [];
         }
 
@@ -238,15 +240,21 @@ class rule_manager {
         } catch (\Exception $exception ) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
+            $matchinguserscache->set($rule->get('id'), 0);
 
             return [];
         }
 
         try {
-            return $DB->get_records_sql($sql . $sqldata->get_join() . ' WHERE ' . $sqldata->get_where(), $sqldata->get_params());
+            $users = $DB->get_records_sql($sql . $sqldata->get_join() . ' WHERE ' . $sqldata->get_where(), $sqldata->get_params());
+            if (empty($userid)) {
+                $matchinguserscache->set($rule->get('id'), count($users));
+            }
+            return $users;
         } catch (\Exception $exception) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
+            $matchinguserscache->set($rule->get('id'), 0);
 
             return [];
         }
@@ -256,37 +264,48 @@ class rule_manager {
      * Get count of matching users for a given rule.
      *
      * @param \tool_dynamic_cohorts\rule $rule
-     * @param int|null $userid
      *
      * @return int
      */
-    public static function get_matching_users_count(rule $rule, ?int $userid = null): int {
+    public static function get_matching_users_count(rule $rule): int {
         global $DB;
+
+        $matchinguserscache = cache::make('tool_dynamic_cohorts', 'matchinguserscount');
+
+        $count = $matchinguserscache->get($rule->get('id'));
+        if ($count !== false) {
+            return $count;
+        }
 
         $conditions = $rule->get_condition_records();
 
         if (empty($conditions)) {
+            $matchinguserscache->set($rule->get('id'), 0);
             return 0;
         }
 
         $sql = "SELECT COUNT(DISTINCT u.id) cnt FROM {user} u";
 
         try {
-            $sqldata = condition_manager::build_sql_data($conditions, $rule->get('operator'), $userid);
+            $sqldata = condition_manager::build_sql_data($conditions, $rule->get('operator'));
         } catch (\Exception $exception ) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
 
+            $matchinguserscache->set($rule->get('id'), 0);
             return 0;
         }
 
         try {
             $result = $DB->get_record_sql($sql . $sqldata->get_join() . ' WHERE ' . $sqldata->get_where(), $sqldata->get_params());
+            $matchinguserscache->set($rule->get('id'), $result->cnt);
+
             return $result->cnt;
         } catch (\Exception $exception) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
 
+            $matchinguserscache->set($rule->get('id'), 0);
             return 0;
         }
     }

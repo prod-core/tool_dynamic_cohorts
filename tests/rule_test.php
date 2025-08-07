@@ -165,4 +165,24 @@ class rule_test extends \advanced_testcase {
         $this->assertFalse($rule->is_broken());
         $this->assertFalse($rule->is_enabled());
     }
+
+    /**
+     * Test updating rule invalidates matching users count cache.
+     */
+    public function test_updating_rule_invalidates_matchinguserscount_cache() {
+        $this->resetAfterTest();
+        $rule = new rule(0, (object)['name' => 'Test rule 1', 'broken' => 0, 'enabled' => 1]);
+        $rule->save();
+
+        $cache = cache::make('tool_dynamic_cohorts', 'matchinguserscount');
+        $cache->set($rule->get('id'), 10);
+
+        $this->assertSame(10, $cache->get($rule->get('id')));
+
+        $rule->set('name', 'Test rule 2');
+        $this->assertSame(10, $cache->get($rule->get('id')));
+
+        $rule->save();
+        $this->assertSame(false, $cache->get($rule->get('id')));
+    }
 }

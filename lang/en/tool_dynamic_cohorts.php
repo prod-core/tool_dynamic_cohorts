@@ -36,6 +36,7 @@ $string['brokenruleswarning'] = 'There are some broken rules require your attent
 $string['bulkprocessing'] = 'Bulk processing';
 $string['bulkprocessing_help'] = 'If this option is enabled, users will be added and removed from cohort in bulk. This will significantly improve processing performance. However, using this option will suppress triggering events when users added or removed from cohort.';
 $string['cachedef_conditionrecords'] = 'Conditions for a rule';
+$string['cachedef_matchingusers'] = 'Matching users for a rule';
 $string['cachedef_rulesconditions'] = 'Rules with a specific condition';
 $string['cohort'] = 'Cohort';
 $string['cohortid'] = 'Cohort';
