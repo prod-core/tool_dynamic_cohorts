@@ -36,12 +36,11 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  * @covers     \tool_dynamic_cohorts\external\rule_conditions
  */
-class rule_conditions_test extends externallib_advanced_testcase {
-
+final class rule_conditions_test extends externallib_advanced_testcase {
     /**
      * Test exception if rule is not exist.
      */
-    public function test_get_conditions_throws_exception_on_invalid_rule() {
+    public function test_get_conditions_throws_exception_on_invalid_rule(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();
@@ -54,7 +53,7 @@ class rule_conditions_test extends externallib_advanced_testcase {
     /**
      * Test required permissions.
      */
-    public function test_get_total_permissions() {
+    public function test_get_total_permissions(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -68,7 +67,7 @@ class rule_conditions_test extends externallib_advanced_testcase {
     /**
      * Test getting conditions for empty rule.
      */
-    public function test_get_conditions_for_empty_rule() {
+    public function test_get_conditions_for_empty_rule(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -83,7 +82,7 @@ class rule_conditions_test extends externallib_advanced_testcase {
     /**
      * Test getting conditions for aa rule.
      */
-    public function test_get_conditions_for_rule() {
+    public function test_get_conditions_for_rule(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

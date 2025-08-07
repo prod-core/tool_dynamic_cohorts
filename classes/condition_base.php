@@ -24,7 +24,6 @@ namespace tool_dynamic_cohorts;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class condition_base {
-
     /**
      * Value for text field types.
      */
@@ -271,5 +270,4 @@ abstract class condition_base {
      * @return bool
      */
     abstract public function is_broken(): bool;
-
 }

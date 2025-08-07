@@ -19,7 +19,7 @@ namespace tool_dynamic_cohorts;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot . '/cohort/lib.php');
 
 /**
  * Cohort manager class.
@@ -29,7 +29,6 @@ require_once($CFG->dirroot.'/cohort/lib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cohort_manager {
-
     /**
      * Cohort component.
      */

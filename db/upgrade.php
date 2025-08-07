@@ -45,7 +45,6 @@ function xmldb_tool_dynamic_cohorts_upgrade($oldversion): bool {
     }
 
     if ($oldversion < 2024091300) {
-
         // Define field realtime to be added to tool_dynamic_cohorts.
         $table = new xmldb_table('tool_dynamic_cohorts');
         $field = new xmldb_field('realtime', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'operator');

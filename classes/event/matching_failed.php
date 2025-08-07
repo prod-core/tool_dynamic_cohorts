@@ -32,7 +32,6 @@ use core\event\base;
   * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
   */
 class matching_failed extends base {
-
     /**
      * Initialise the rule data.
      */

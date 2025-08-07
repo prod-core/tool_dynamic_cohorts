@@ -26,7 +26,6 @@ use tool_dynamic_cohorts\condition_sql;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait fields_trait {
-
     /**
      * Gets a list of comparison operators for text fields.
      *
@@ -365,7 +364,7 @@ trait fields_trait {
         }
 
         $param = condition_sql::generate_param_alias();
-        $field = $DB->sql_cast_to_char($tablealias . '.' .$fieldname);
+        $field = $DB->sql_cast_to_char($tablealias . '.' . $fieldname);
 
         switch ($operatorvalue) {
             case self::TEXT_IS_EQUAL_TO:

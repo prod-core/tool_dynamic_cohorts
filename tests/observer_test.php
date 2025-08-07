@@ -28,8 +28,7 @@ use tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_profile;
  *
  * @covers     \tool_dynamic_cohorts\observer
  */
-class observer_test extends advanced_testcase {
-
+final class observer_test extends advanced_testcase {
     /**
      * Cohort for testing
      * @var \stdClass
@@ -48,7 +47,7 @@ class observer_test extends advanced_testcase {
     /**
      * Test that user creation event triggers rule processing for that user.
      */
-    public function test_user_creation_triggers_rule_processing() {
+    public function test_user_creation_triggers_rule_processing(): void {
         global $DB;
 
         $rule = new rule(0, (object)['name' => 'Test rule 1', 'enabled' => 1, 'cohortid' => $this->cohort->id, 'realtime' => 1]);
@@ -81,7 +80,7 @@ class observer_test extends advanced_testcase {
     /**
      * Test that user updating event triggers rule processing for that user.
      */
-    public function test_user_updating_triggers_rule_processing() {
+    public function test_user_updating_triggers_rule_processing(): void {
         global $DB;
 
         $user1 = $this->getDataGenerator()->create_user(['username' => 'user1']);
@@ -118,7 +117,7 @@ class observer_test extends advanced_testcase {
     /**
      * Test that user creation event doesn't trigger rule processing for that user if realtime processing is disabled globally.
      */
-    public function test_realtime_rule_processing_when_disabled_globally() {
+    public function test_realtime_rule_processing_when_disabled_globally(): void {
         global $DB;
 
         set_config('realtime', 0, 'tool_dynamic_cohorts');
@@ -153,7 +152,7 @@ class observer_test extends advanced_testcase {
     /**
      * Test that user creation event doesn't trigger rule processing for that user if realtime processing is disabled for the rule.
      */
-    public function test_realtime_rule_processing_when_disabled_for_a_rule() {
+    public function test_realtime_rule_processing_when_disabled_for_a_rule(): void {
         global $DB;
 
         set_config('realtime', 1, 'tool_dynamic_cohorts');

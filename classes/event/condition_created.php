@@ -33,7 +33,6 @@ use core\event\base;
   * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
   */
 class condition_created extends base {
-
     /**
      * Initialise the rule data.
      */
@@ -82,5 +81,4 @@ class condition_created extends base {
             throw new \coding_exception('The \'description\' value must be set in other.');
         }
     }
-
 }

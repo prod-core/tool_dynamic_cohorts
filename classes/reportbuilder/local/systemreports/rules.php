@@ -38,7 +38,6 @@ use tool_dynamic_cohorts\rule_manager;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rules extends system_report {
-
     /**
      * Initialise the report.
      *
@@ -70,7 +69,7 @@ class rules extends system_report {
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(false)
             ->add_fields("{$rulealias}.id")
-            ->add_callback(static function($id): string {
+            ->add_callback(static function ($id): string {
                 global $OUTPUT;
 
                 $url = new moodle_url('/admin/tool/dynamic_cohorts/index.php');
@@ -91,7 +90,7 @@ class rules extends system_report {
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(false)
             ->add_fields("{$rulealias}.id, {$rulealias}.operator")
-            ->add_callback(static function($id, $row): string {
+            ->add_callback(static function ($id, $row): string {
                 $rule = new rule(0, $row);
                 $conditions = count($rule->get_condition_records());
 
@@ -152,7 +151,7 @@ class rules extends system_report {
             ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'enable'],
             false,
             new lang_string('enable')
-        ))->add_callback(function(\stdClass $row): bool {
+        ))->add_callback(function (\stdClass $row): bool {
             return empty($row->enabled);
         }));
 
@@ -162,7 +161,7 @@ class rules extends system_report {
             ['class' => 'tool-dynamic-cohorts-rule-toggle', 'data-ruleid' => ':id', 'data-action' => 'disable'],
             false,
             new lang_string('disable')
-        ))->add_callback(function(\stdClass $row): bool {
+        ))->add_callback(function (\stdClass $row): bool {
             return !empty($row->enabled);
         }));
 

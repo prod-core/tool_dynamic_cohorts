@@ -28,7 +28,6 @@ use context_course;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_enrolment extends condition_base {
-
     /**
      * Operator for not enrolled users.
      */

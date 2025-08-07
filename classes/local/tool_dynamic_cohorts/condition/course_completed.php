@@ -32,7 +32,6 @@ require_once($CFG->libdir . '/completionlib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_completed extends condition_base {
-
     /**
      * Operator for any completion date.
      */

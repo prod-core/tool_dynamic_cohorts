@@ -26,7 +26,6 @@ use tool_dynamic_cohorts\condition_sql;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_not_completed extends course_completed {
-
     /**
      * Condition name.
      *

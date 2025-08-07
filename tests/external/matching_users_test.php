@@ -34,12 +34,11 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  * @covers     \tool_dynamic_cohorts\external\matching_users
  */
-class matching_users_test extends externallib_advanced_testcase {
-
+final class matching_users_test extends externallib_advanced_testcase {
     /**
      * Test exception if rule is not exist.
      */
-    public function test_get_total_throws_exception_on_invalid_rule() {
+    public function test_get_total_throws_exception_on_invalid_rule(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();
@@ -52,7 +51,7 @@ class matching_users_test extends externallib_advanced_testcase {
     /**
      * Test required permissions.
      */
-    public function test_get_total_permissions() {
+    public function test_get_total_permissions(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -66,7 +65,7 @@ class matching_users_test extends externallib_advanced_testcase {
     /**
      * Test can get total.
      */
-    public function test_get_total_empty() {
+    public function test_get_total_empty(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -79,7 +78,7 @@ class matching_users_test extends externallib_advanced_testcase {
     /**
      * Test can get total.
      */
-    public function test_get_total() {
+    public function test_get_total(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();

@@ -27,8 +27,7 @@ use tool_dynamic_cohorts\condition_base;
  *
  * @covers     \tool_dynamic_cohorts\local\tool_dynamic_cohorts\condition\user_custom_profile
  */
-class user_custom_profile_test extends \advanced_testcase {
-
+final class user_custom_profile_test extends \advanced_testcase {
     /**
      * Get condition instance for testing.
      *
@@ -80,7 +79,7 @@ class user_custom_profile_test extends \advanced_testcase {
     /**
      * Test retrieving of config data.
      */
-    public function test_retrieving_configdata() {
+    public function test_retrieving_configdata(): void {
         // Without missing data field.
         $formdata = [
             'id' => 1,
@@ -126,7 +125,7 @@ class user_custom_profile_test extends \advanced_testcase {
     /**
      * Test setting and getting config data.
      */
-    public function test_set_and_get_configdata() {
+    public function test_set_and_get_configdata(): void {
         // Without missing data field.
         $configdata = [
             'profilefield' => 'firstname',
@@ -138,7 +137,7 @@ class user_custom_profile_test extends \advanced_testcase {
         $instance = $this->get_condition($configdata);
 
         $this->assertEquals(
-            ['profilefield' => 'firstname',  'firstname_operator' => 3,  'firstname_value' => 123, 'include_missing_data' => 1],
+            ['profilefield' => 'firstname', 'firstname_operator' => 3, 'firstname_value' => 123, 'include_missing_data' => 1],
             $instance->get_config_data()
         );
     }
@@ -169,7 +168,7 @@ class user_custom_profile_test extends \advanced_testcase {
      * @param string $expected
      * @param bool $shouldincludemissing
      */
-    public function test_config_description(int $operator, string $expected, bool $shouldincludemissing) {
+    public function test_config_description(int $operator, string $expected, bool $shouldincludemissing): void {
         $this->resetAfterTest();
 
         $this->add_user_profile_field('field1', 'text');
@@ -203,7 +202,7 @@ class user_custom_profile_test extends \advanced_testcase {
     /**
      * Test sql data generation.
      */
-    public function test_get_sql_data() {
+    public function test_get_sql_data(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -345,7 +344,7 @@ class user_custom_profile_test extends \advanced_testcase {
     /**
      * Test events that the condition is listening to.
      */
-    public function test_get_events() {
+    public function test_get_events(): void {
         $this->assertEquals([
             '\core\event\user_created',
             '\core\event\user_updated',
@@ -355,7 +354,7 @@ class user_custom_profile_test extends \advanced_testcase {
     /**
      * Test is broken.
      */
-    public function test_is_broken() {
+    public function test_is_broken(): void {
         $this->resetAfterTest();
 
         $condition = $this->get_condition();

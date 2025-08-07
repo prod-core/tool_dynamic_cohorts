@@ -33,12 +33,11 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  * @covers     \tool_dynamic_cohorts\external\rules
  */
-class rules_test extends externallib_advanced_testcase {
-
+final class rules_test extends externallib_advanced_testcase {
     /**
      * Test exception if rule is not exist.
      */
-    public function test_delete_rules_exception_on_invalid_rule() {
+    public function test_delete_rules_exception_on_invalid_rule(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();
@@ -51,7 +50,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test required permissions.
      */
-    public function test_delete_rules_permissions() {
+    public function test_delete_rules_permissions(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -65,7 +64,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test exception thrown on deleting invalid rule.
      */
-    public function test_exception_delete_rules_when_one_is_invalid() {
+    public function test_exception_delete_rules_when_one_is_invalid(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -81,7 +80,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test rules are not deleted if one is invalid.
      */
-    public function test_delete_rules_keep_rules_when_one_is_invalid() {
+    public function test_delete_rules_keep_rules_when_one_is_invalid(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -107,7 +106,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test exception if rule is not exist.
      */
-    public function test_toggle_status_exception_on_invalid_rule() {
+    public function test_toggle_status_exception_on_invalid_rule(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();
@@ -120,7 +119,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test required permissions.
      */
-    public function test_toggle_status_permissions() {
+    public function test_toggle_status_permissions(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -134,7 +133,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test exception is thrown trying to toggle a broken rule
      */
-    public function test_exception_toggle_status_on_broken_rule() {
+    public function test_exception_toggle_status_on_broken_rule(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -151,7 +150,7 @@ class rules_test extends externallib_advanced_testcase {
     /**
      * Test toggling status on rule.
      */
-    public function test_toggle_status_on_rule() {
+    public function test_toggle_status_on_rule(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

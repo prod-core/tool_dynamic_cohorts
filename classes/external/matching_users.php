@@ -32,7 +32,6 @@ use tool_dynamic_cohorts\rule_manager;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class matching_users extends external_api {
-
     /**
      * Describes the parameters for validate_form webservice.
      * @return external_function_parameters

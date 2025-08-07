@@ -35,7 +35,6 @@ use tool_dynamic_cohorts\rule_manager;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rules extends external_api {
-
     /**
      * Describes the parameters for delete_rule webservice.
      *
@@ -44,8 +43,10 @@ class rules extends external_api {
     public static function delete_rules_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'ruleids' => new external_multiple_structure(new external_value(PARAM_INT, 'Rule IDs'),
-                    'List of rule ids to delete.'),
+                'ruleids' => new external_multiple_structure(
+                    new external_value(PARAM_INT, 'Rule IDs'),
+                    'List of rule ids to delete.'
+                ),
             ]
         );
     }

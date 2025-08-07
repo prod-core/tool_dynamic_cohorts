@@ -25,12 +25,11 @@ namespace tool_dynamic_cohorts;
  *
  * @covers     \tool_dynamic_cohorts\cohort_manager
  */
-class cohort_manager_test extends \advanced_testcase {
-
+final class cohort_manager_test extends \advanced_testcase {
     /**
      * Test getting available cohorts.
      */
-    public function test_get_available_cohorts() {
+    public function test_get_available_cohorts(): void {
         $this->resetAfterTest();
 
         $this->assertEmpty(cohort_manager::get_cohorts());
@@ -61,7 +60,7 @@ class cohort_manager_test extends \advanced_testcase {
     /**
      * Test managing cohort.
      */
-    public function test_manage_cohort() {
+    public function test_manage_cohort(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -76,7 +75,7 @@ class cohort_manager_test extends \advanced_testcase {
     /**
      * Test unmanaging cohort.
      */
-    public function test_unmanage_cohort() {
+    public function test_unmanage_cohort(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -91,7 +90,7 @@ class cohort_manager_test extends \advanced_testcase {
     /**
      * Test un managing cohort removes members when configured.
      */
-    public function test_unmanage_cohort_removes_members() {
+    public function test_unmanage_cohort_removes_members(): void {
         global $DB;
 
         $this->resetAfterTest();

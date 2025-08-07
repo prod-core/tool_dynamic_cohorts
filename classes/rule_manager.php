@@ -26,7 +26,7 @@ use tool_dynamic_cohorts\event\rule_updated;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot . '/cohort/lib.php');
 
 /**
  * Rule manager class.
@@ -36,7 +36,6 @@ require_once($CFG->dirroot.'/cohort/lib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_manager {
-
     /**
      * A number of users for a bulk processing.
      */
@@ -168,7 +167,7 @@ class rule_manager {
             return $rule;
         } catch (\Exception $exception) {
             $transaction->rollback($exception);
-            throw new $exception;
+            throw new $exception();
         }
     }
 
@@ -237,7 +236,7 @@ class rule_manager {
 
         try {
             $sqldata = condition_manager::build_sql_data($conditions, $rule->get('operator'), $userid);
-        } catch (\Exception $exception ) {
+        } catch (\Exception $exception) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
             $matchinguserscache->set($rule->get('id'), 0);
@@ -288,7 +287,7 @@ class rule_manager {
 
         try {
             $sqldata = condition_manager::build_sql_data($conditions, $rule->get('operator'));
-        } catch (\Exception $exception ) {
+        } catch (\Exception $exception) {
             self::trigger_matching_failed_event($rule, $exception->getMessage());
             $rule->mark_broken();
 
@@ -379,7 +378,7 @@ class rule_manager {
 
             foreach (array_chunk($userstodelete, self::BULK_PROCESSING_SIZE) as $users) {
                 $userids = array_column($users, 'userid');
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
                 $sql = "userid $insql AND cohortid = :cohort";
                 $inparams['cohort'] = $cohortid;
                 $DB->delete_records_select('cohort_members', $sql, $inparams);

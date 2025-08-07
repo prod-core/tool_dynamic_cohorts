@@ -29,7 +29,6 @@ use html_writer;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cohort_membership extends condition_base {
-
     /**
      * A field name in the form.
      */
@@ -215,7 +214,7 @@ class cohort_membership extends condition_base {
             $innertable = condition_sql::generate_table_alias();
             $outertable = condition_sql::generate_table_alias();
 
-            list($sql, $params) = $DB->get_in_or_equal(
+            [$sql, $params] = $DB->get_in_or_equal(
                 $this->get_configured_cohorts(),
                 SQL_PARAMS_NAMED,
                 condition_sql::generate_param_alias()
