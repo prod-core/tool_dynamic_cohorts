@@ -303,26 +303,30 @@ class user_role extends condition_base {
                     break;
                 case CONTEXT_COURSECAT:
                     $context = context_coursecat::instance($this->get_categoryid_value());
-                    [$parentcontexsql, $parentcparams] = $DB->get_in_or_equal(
-                        $context->get_parent_context_ids(true),
-                        SQL_PARAMS_NAMED,
-                        condition_sql::generate_param_alias()
-                    );
-                    $params = array_merge($params, $parentcparams);
 
-                    $childcontxtids = array_keys($context->get_child_contexts());
+                    if ($this->get_includechildren_value()) {
+                        $contextids = [$context->id];
+                        $sql = "SELECT ctx.id
+                                  FROM {context} ctx
+                                 WHERE ctx.path LIKE :pathpattern";
+                        $descendants = $DB->get_records_sql($sql, ['pathpattern' => $context->path . '/%']);
+                        $contextids = array_merge($contextids, array_keys($descendants));
 
-                    if ($this->get_includechildren_value() && !empty($childcontxtids)) {
-                        $childcontxtids = array_keys($context->get_child_contexts());
-                        [$childcontextsql, $childcparams] = $DB->get_in_or_equal(
-                            $childcontxtids,
+                        [$contextsql, $cparams] = $DB->get_in_or_equal(
+                            $contextids,
                             SQL_PARAMS_NAMED,
                             condition_sql::generate_param_alias()
                         );
-                        $params = array_merge($params, $childcparams);
-                        $innerwhere .= " AND ( $ratable.contextid $parentcontexsql OR  $ratable.contextid $childcontextsql ) ";
+                        $params = array_merge($params, $cparams);
+                        $innerwhere .= " AND $ratable.contextid $contextsql";
                     } else {
-                        $innerwhere .= " AND $ratable.contextid $parentcontexsql ";
+                        [$parentcontexsql, $parentcparams] = $DB->get_in_or_equal(
+                            $context->get_parent_context_ids(true),
+                            SQL_PARAMS_NAMED,
+                            condition_sql::generate_param_alias()
+                        );
+                        $params = array_merge($params, $parentcparams);
+                        $innerwhere .= " AND $ratable.contextid $parentcontexsql";
                     }
 
                     break;
