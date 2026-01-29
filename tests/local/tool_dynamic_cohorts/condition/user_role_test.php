@@ -811,9 +811,11 @@ final class user_role_test extends \advanced_testcase {
         $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
         $actual = $DB->get_records_sql($sql, $result->get_params());
 
-        $testuserids = array_map(function($u) { return $u->id;
+        $testuserids = array_map(function ($u) {
+            return $u->id;
         }, $users);
-        $actualtest = array_filter($actual, function($u) use ($testuserids) {
+
+        $actualtest = array_filter($actual, function ($u) use ($testuserids) {
             return in_array($u->id, $testuserids);
         });
 
