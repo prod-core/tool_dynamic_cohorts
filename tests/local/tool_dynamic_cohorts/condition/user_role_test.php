@@ -685,4 +685,210 @@ final class user_role_test extends \advanced_testcase {
             'core\event\role_unassigned',
         ], $this->get_condition()->get_events());
     }
+
+    /**
+     * Test includechildren with nested categories.
+     */
+    public function test_includechildren_with_nested_categories(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $totalusers = 10;
+        $users = [];
+        for ($i = 0; $i < $totalusers; $i++) {
+            $users[$i] = $this->getDataGenerator()->create_user();
+        }
+
+        // Create roles.
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $rootcategory = $this->getDataGenerator()->create_category(['name' => 'Root Category']);
+        $categorya = $this->getDataGenerator()->create_category([
+            'name' => 'Category A',
+            'parent' => $rootcategory->id,
+        ]);
+        $subcategorya1 = $this->getDataGenerator()->create_category([
+            'name' => 'Subcategory A1',
+            'parent' => $categorya->id,
+        ]);
+
+        $course1 = $this->getDataGenerator()->create_course(['category' => $rootcategory->id]);
+        $course2 = $this->getDataGenerator()->create_course(['category' => $categorya->id]);
+        $course3 = $this->getDataGenerator()->create_course(['category' => $subcategorya1->id]);
+
+        $rootcontext = \context_coursecat::instance($rootcategory->id);
+        role_assign($teacherrole->id, $users[0]->id, $rootcontext->id);
+
+        $categoryacontext = \context_coursecat::instance($categorya->id);
+        role_assign($teacherrole->id, $users[1]->id, $categoryacontext->id);
+
+        $subcategorya1context = \context_coursecat::instance($subcategorya1->id);
+        role_assign($teacherrole->id, $users[2]->id, $subcategorya1context->id);
+
+        $course1context = \context_course::instance($course1->id);
+        role_assign($teacherrole->id, $users[3]->id, $course1context->id);
+
+        $course2context = \context_course::instance($course2->id);
+        role_assign($teacherrole->id, $users[4]->id, $course2context->id);
+
+        $course3context = \context_course::instance($course3->id);
+        role_assign($teacherrole->id, $users[5]->id, $course3context->id);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $rootcategory->id,
+            'includechildren' => 0,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey($users[0]->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $rootcategory->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(6, $actual);
+        $this->assertArrayHasKey($users[0]->id, $actual);
+        $this->assertArrayHasKey($users[1]->id, $actual);
+        $this->assertArrayHasKey($users[2]->id, $actual);
+        $this->assertArrayHasKey($users[3]->id, $actual);
+        $this->assertArrayHasKey($users[4]->id, $actual);
+        $this->assertArrayHasKey($users[5]->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $categorya->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(4, $actual);
+        $this->assertArrayHasKey($users[1]->id, $actual);
+        $this->assertArrayHasKey($users[2]->id, $actual);
+        $this->assertArrayHasKey($users[4]->id, $actual);
+        $this->assertArrayHasKey($users[5]->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $subcategorya1->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(2, $actual);
+        $this->assertArrayHasKey($users[2]->id, $actual);
+        $this->assertArrayHasKey($users[5]->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_DO_NOT_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $rootcategory->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $testuserids = array_map(function ($u) {
+            return $u->id;
+        }, $users);
+
+        $actualtest = array_filter($actual, function ($u) use ($testuserids) {
+            return in_array($u->id, $testuserids);
+        });
+
+        $this->assertCount($totalusers - 6, $actualtest);
+        $this->assertArrayNotHasKey($users[0]->id, $actualtest);
+        $this->assertArrayNotHasKey($users[1]->id, $actualtest);
+        $this->assertArrayNotHasKey($users[2]->id, $actualtest);
+        $this->assertArrayNotHasKey($users[3]->id, $actualtest);
+        $this->assertArrayNotHasKey($users[4]->id, $actualtest);
+        $this->assertArrayNotHasKey($users[5]->id, $actualtest);
+    }
+
+    /**
+     * Test includechildren with deep nesting.
+     */
+    public function test_includechildren_with_very_deep_nesting(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // Create test user.
+        $user = $this->getDataGenerator()->create_user();
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $cat1 = $this->getDataGenerator()->create_category(['name' => 'Level 1']);
+        $cat2 = $this->getDataGenerator()->create_category(['name' => 'Level 2', 'parent' => $cat1->id]);
+        $cat3 = $this->getDataGenerator()->create_category(['name' => 'Level 3', 'parent' => $cat2->id]);
+        $cat4 = $this->getDataGenerator()->create_category(['name' => 'Level 4', 'parent' => $cat3->id]);
+        $course = $this->getDataGenerator()->create_course(['category' => $cat4->id]);
+
+        $coursecontext = \context_course::instance($course->id);
+        role_assign($teacherrole->id, $user->id, $coursecontext->id);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $cat1->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey($user->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $cat2->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey($user->id, $actual);
+
+        $condition = $this->get_condition([
+            'operator' => user_role::OPERATOR_HAVE_ROLE,
+            'roleid' => $teacherrole->id,
+            'contextlevel' => CONTEXT_COURSECAT,
+            'categoryid' => $cat3->id,
+            'includechildren' => 1,
+        ]);
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $actual = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey($user->id, $actual);
+    }
 }
