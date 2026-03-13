@@ -218,7 +218,7 @@ final class user_custom_profile_test extends \advanced_testcase {
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldtext1->shortname => 'User 1 Field 1']);
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldtext2->shortname => 'Opt 1']);
         profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fieldcheckbox->shortname => '1']);
-        profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fielddate->shortname => $now - WEEKSECS]);
+        profile_save_data((object)['id' => $user1->id, 'profile_field_' . $fielddate->shortname => 951868800]);
 
         $user2 = $this->getDataGenerator()->create_user(['username' => 'user2']);
         profile_save_data((object)['id' => $user2->id, 'profile_field_' . $fieldtext1->shortname => 'User 2 Field 1']);

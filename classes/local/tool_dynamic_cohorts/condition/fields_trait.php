@@ -390,6 +390,8 @@ trait fields_trait {
      * @return condition_sql
      */
     protected function get_date_sql(string $tablealias, string $fieldname): condition_sql {
+        global $DB;
+
         $fieldvalue = $this->get_field_value();
         $operatorvalue = $this->get_operator_value();
 
@@ -397,30 +399,33 @@ trait fields_trait {
             return new condition_sql('', '', []);
         }
 
+        // We have to cast field to int as data is stored in DB as text and we comparing it to integer.
+        $field = $DB->sql_cast_char2int("$tablealias.$fieldname", true);
         $param = condition_sql::generate_param_alias();
+
         switch ($operatorvalue) {
             case self::TEXT_IS_EMPTY:
-                $where = "$tablealias.$fieldname = :$param OR $tablealias.$fieldname IS NULL";
+                $where = "$field = :$param OR $tablealias.$fieldname IS NULL";
                 $params[$param] = 0;
                 break;
             case self::TEXT_IS_NOT_EMPTY:
-                $where = "$tablealias.$fieldname <> :$param";
+                $where = "$field <> :$param";
                 $params[$param] = (int) $fieldvalue;
                 break;
             case self::DATE_IS_BEFORE:
-                $where = "$tablealias.$fieldname <= :$param";
+                $where = "$field <= :$param";
                 $params[$param] = (int) $fieldvalue;
                 break;
             case self::DATE_IS_AFTER:
-                $where = "$tablealias.$fieldname >= :$param";
+                $where = "$field >= :$param";
                 $params[$param] = (int) $fieldvalue;
                 break;
             case self::DATE_IN_THE_FUTURE:
-                $where = "$tablealias.$fieldname >= :$param";
+                $where = "$field >= :$param";
                 $params[$param] = time();
                 break;
             case self::DATE_IN_THE_PAST:
-                $where = "$tablealias.$fieldname <= :$param";
+                $where = "$field <= :$param";
                 $params[$param] = time();
                 break;
             default:
