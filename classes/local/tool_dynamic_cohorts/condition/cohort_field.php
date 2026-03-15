@@ -140,6 +140,7 @@ class cohort_field extends condition_base {
 
                 $shortname = self::CUSTOM_FIELD_PREFIX . $customfield->get('shortname');
                 $fields[$shortname] = new \stdClass();
+                $fields[$shortname]->id = $customfield->get('id');
                 $fields[$shortname]->name = $customfield->get_formatted_name();
                 $fields[$shortname]->shortname = $shortname;
                 $fields[$shortname]->datatype = $customfield->get('type');
@@ -368,7 +369,8 @@ class cohort_field extends condition_base {
 
         if (!$this->is_broken()) {
             $configuredfield = $this->get_field_name();
-            $datatype = $this->get_fields_info()[$configuredfield]->datatype;
+            $fieldinfo = $this->get_fields_info()[$configuredfield];
+            $datatype = $fieldinfo->datatype;
             $fieldstable = condition_sql::generate_table_alias();
 
             // For custom fields target DB column "value" is from {customfield_data}.
@@ -398,26 +400,23 @@ class cohort_field extends condition_base {
 
             if ($this->is_custom_field($configuredfield)) {
                 $cohorttbl = condition_sql::generate_table_alias();
-                $fieldtbl = condition_sql::generate_table_alias();
-                $fieldcategorytbl = condition_sql::generate_table_alias();
-                $shortnameparam = condition_sql::generate_param_alias();
+                $fieldidparam = condition_sql::generate_param_alias();
 
-                $params[$shortnameparam] = str_replace(self::CUSTOM_FIELD_PREFIX, '', $configuredfield);
+                $params[$fieldidparam] = $fieldinfo->id;
 
-                $cohortwhere = "$fieldcategorytbl.component = 'core_cohort'
-                                     AND $fieldcategorytbl.area = 'cohort'
-                                     AND $fieldtbl.shortname = :$shortnameparam
-                                     AND $fieldwhere";
+                $cohortwhere = $fieldwhere;
 
                 if ($this->should_include_missing_data()) {
                     $cohortwhere .= " OR $fieldstable.instanceid IS NULL";
                 }
 
+                // The subquery prevents sql_cast_char2int from running on text values stored by other fields in the same column.
                 $cohortsql = "SELECT $cohorttbl.id
                                 FROM {cohort} $cohorttbl
-                           LEFT JOIN {customfield_data} $fieldstable ON $fieldstable.instanceid = $cohorttbl.id
-                           LEFT JOIN {customfield_field} $fieldtbl ON $fieldstable.fieldid = $fieldtbl.id
-                           LEFT JOIN {customfield_category} $fieldcategorytbl ON $fieldcategorytbl.id = $fieldtbl.categoryid
+                           LEFT JOIN (SELECT {$fieldstable}.instanceid, {$fieldstable}.value
+                                        FROM {customfield_data} {$fieldstable}
+                                       WHERE {$fieldstable}.fieldid = :{$fieldidparam}) {$fieldstable}
+                                  ON {$fieldstable}.instanceid = {$cohorttbl}.id
                                      $fieldjoin
                                WHERE $cohortwhere";
             } else {
