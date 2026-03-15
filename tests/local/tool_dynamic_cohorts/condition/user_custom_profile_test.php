@@ -71,7 +71,7 @@ final class user_custom_profile_test extends \advanced_testcase {
             $data->{$name} = $value;
         }
 
-        $DB->insert_record('user_info_field', $data);
+        $data->id = $DB->insert_record('user_info_field', $data);
 
         return $data;
     }
@@ -339,6 +339,50 @@ final class user_custom_profile_test extends \advanced_testcase {
         $users = $DB->get_records_sql($sql, $result->get_params());
         $this->assertCount(1, $users);
         $this->assertArrayHasKey($user1->id, $users);
+    }
+
+    /**
+     * Test that datetime comparisons use numeric ordering, not lexical string ordering.
+     */
+    public function test_get_sql_data_date_comparison_is_numeric(): void {
+        global $CFG, $DB;
+
+        $this->resetAfterTest();
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
+        // Create a text field to cover sql_cast_char2int regressions.
+        $textfield = $this->add_user_profile_field('field1', 'text');
+        $datefield = $this->add_user_profile_field('field4', 'datetime', ['param1' => 2000, 'param2' => 5000]);
+
+        // These specific values are taken from the original bug report (#160).
+        $lowerdate = 952899000;
+        $threshold = 1205280000;
+        $higherdate = 1205280000 + 86400;
+
+        $userbeforethreshold = $this->getDataGenerator()->create_user(['username' => 'userdatebeforethreshold']);
+        profile_save_data((object) ['id' => $userbeforethreshold->id, 'profile_field_' . $textfield->shortname => 'User 1 Field 1']);
+        profile_save_data((object) ['id' => $userbeforethreshold->id, 'profile_field_' . $datefield->shortname => $lowerdate]);
+
+        $userafterthreshold = $this->getDataGenerator()->create_user(['username' => 'userdateafterthreshold']);
+        profile_save_data((object) ['id' => $userafterthreshold->id, 'profile_field_' . $textfield->shortname => 'User 2 Field 1']);
+        profile_save_data((object) ['id' => $userafterthreshold->id, 'profile_field_' . $datefield->shortname => $higherdate]);
+
+        $fieldname = 'profile_field_' . $datefield->shortname;
+        $condition = $this->get_condition([
+            'profilefield' => $fieldname,
+            $fieldname . '_operator' => condition_base::DATE_IS_AFTER,
+            $fieldname . '_value' => $threshold,
+            'include_missing_data' => 0,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $users = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($userafterthreshold->id, $users);
+        $this->assertArrayNotHasKey($userbeforethreshold->id, $users);
     }
 
     /**
