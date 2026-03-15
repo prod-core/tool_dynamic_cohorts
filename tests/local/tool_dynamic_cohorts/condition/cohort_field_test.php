@@ -529,6 +529,59 @@ final class cohort_field_test extends \advanced_testcase {
     }
 
     /**
+     * Test that custom field date comparisons use numeric ordering, not lexical string ordering.
+     */
+    public function test_get_sql_data_custom_field_date_comparison_is_numeric(): void {
+        global $DB;
+
+        if (!class_exists(\core_cohort\customfield\cohort_handler::class)) {
+            $this->markTestSkipped();
+        }
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Create a text field to cover sql_cast_char2int regressions.
+        $textfield = $this->create_cohort_custom_field('textfield', 'text');
+        $datefield = $this->create_cohort_custom_field('datefield', 'date');
+
+        // These specific values are taken from the original bug report (#160).
+        $lowerdate = 952899000;
+        $threshold = 1205280000;
+        $higherdate = 1205280000 + 86400;
+
+        $cohortbeforethreshold = $this->getDataGenerator()->create_cohort([
+            'customfield_' . $textfield->get('shortname') => 'Test value 1',
+            'customfield_' . $datefield->get('shortname') => $lowerdate,
+        ]);
+        $cohortafterthreshold = $this->getDataGenerator()->create_cohort([
+            'customfield_' . $textfield->get('shortname') => 'Test value 2',
+            'customfield_' . $datefield->get('shortname') => $higherdate,
+        ]);
+
+        $userbeforethreshold = $this->getDataGenerator()->create_user(['username' => 'datebeforethreshold']);
+        $userafterthreshold = $this->getDataGenerator()->create_user(['username' => 'dateafterthreshold']);
+        cohort_add_member($cohortbeforethreshold->id, $userbeforethreshold->id);
+        cohort_add_member($cohortafterthreshold->id, $userafterthreshold->id);
+
+        $datefieldname = cohort_field::CUSTOM_FIELD_PREFIX . $datefield->get('shortname');
+        $condition = $this->get_condition([
+            'cohort_field_operator' => cohort_field::OPERATOR_IS_MEMBER_OF,
+            'cohort_field_field' => $datefieldname,
+            $datefieldname . '_operator' => condition_base::DATE_IS_AFTER,
+            $datefieldname . '_value' => $threshold,
+        ]);
+
+        $result = $condition->get_sql();
+        $sql = "SELECT u.id FROM {user} u {$result->get_join()} WHERE {$result->get_where()}";
+        $users = $DB->get_records_sql($sql, $result->get_params());
+
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($userafterthreshold->id, $users);
+        $this->assertArrayNotHasKey($userbeforethreshold->id, $users);
+    }
+
+    /**
      * Test events that the condition is listening to.
      */
     public function test_get_events(): void {
