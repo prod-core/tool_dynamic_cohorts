@@ -80,7 +80,7 @@ class user_custom_profile extends user_profile {
 
             $field = (object)array_intersect_key(
                 (array)$customfield->field,
-                ['shortname' => 1, 'name' => 1, 'datatype' => 1, 'param1' => 1]
+                ['id' => 1, 'shortname' => 1, 'name' => 1, 'datatype' => 1, 'param1' => 1]
             );
 
             switch ($field->datatype) {
@@ -186,7 +186,8 @@ class user_custom_profile extends user_profile {
         $result = new condition_sql('', '1=0', []);
 
         $configuredfield = $this->get_field_name();
-        $datatype = $this->get_fields_info()[$configuredfield]->datatype;
+        $fieldinfo = $this->get_fields_info()[$configuredfield];
+        $datatype = $fieldinfo->datatype;
         $ud = condition_sql::generate_table_alias();
 
         switch ($datatype) {
@@ -206,21 +207,18 @@ class user_custom_profile extends user_profile {
         }
 
         if (!empty($result->get_params())) {
-            $userinfofield = condition_sql::generate_table_alias();
             $userinfodata = condition_sql::generate_table_alias();
-
-            $shortnameparam = condition_sql::generate_param_alias();
+            $fieldidparam = condition_sql::generate_param_alias();
             $extrafields = "{$userinfodata}.data, {$userinfodata}.userid";
 
+            // The subquery prevents sql_cast_char2int from running on text values stored by other fields in the same column.
             $join = "LEFT JOIN (SELECT $extrafields
-                                 FROM {user_info_data} $userinfodata
-                                 JOIN {user_info_field} $userinfofield
-                                   ON ({$userinfofield}.id = {$userinfodata}.fieldid
-                                      AND {$userinfofield}.shortname = :{$shortnameparam})) $ud
-                           ON ({$ud}.userid = u.id)";
+                                  FROM {user_info_data} $userinfodata
+                                 WHERE {$userinfodata}.fieldid = :{$fieldidparam}) $ud
+                            ON ({$ud}.userid = u.id)";
 
             $params = $result->get_params();
-            $params[$shortnameparam] = str_replace(self::FIELD_PREFIX, '', $configuredfield);
+            $params[$fieldidparam] = $fieldinfo->id;
 
             $where = $result->get_where();
 
