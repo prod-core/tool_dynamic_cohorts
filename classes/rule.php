@@ -49,8 +49,7 @@ class rule extends persistent {
                 'null' => NULL_ALLOWED,
             ],
             'cohortid' => [
-                'type' => PARAM_INT,
-                'default' => 0,
+                'type' => PARAM_TEXT,
             ],
             'enabled' => [
                 'type' => PARAM_INT,

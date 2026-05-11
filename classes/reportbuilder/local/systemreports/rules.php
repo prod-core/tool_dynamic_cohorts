@@ -52,14 +52,32 @@ class rules extends system_report {
         // Any columns required by actions should be defined here to ensure they're always available.
         $this->add_base_fields("{$rulealias}.id, {$rulealias}.enabled");
 
-        $cohortentity = new cohort();
-        $cohortalias = $cohortentity->get_table_alias('cohort');
-        $this->add_entity($cohortentity
-             ->add_join("JOIN {cohort} {$cohortalias} ON {$cohortalias}.id = {$rulealias}.cohortid"));
-
         $this->add_column_from_entity('rule_entity:name');
         $this->add_column_from_entity('rule_entity:description');
-        $this->add_column_from_entity('cohort:name');
+
+        $this->add_column(new column(
+            'cohorts',
+            new lang_string('cohort', 'tool_dynamic_cohorts'),
+            $ruleentity->get_entity_name()
+        ))
+            ->set_type(column::TYPE_TEXT)
+            ->set_is_sortable(false)
+            ->add_fields("{$rulealias}.cohortid")
+            ->add_callback(static function ($cohortid): string {
+                global $DB;
+
+                if (empty($cohortid)) {
+                    return '';
+                }
+
+                $cohortids = explode(',', $cohortid);
+                $cohorts = $DB->get_records_list('cohort', 'id', $cohortids, '', 'id, name');
+                $cohortnames = array_map(function ($cohort) {
+                    return $cohort->name;
+                }, $cohorts);
+
+                return implode(', ', $cohortnames);
+            });
 
         $this->add_column(new column(
             'matchingusers',
@@ -109,9 +127,6 @@ class rules extends system_report {
         $this->add_column_from_entity('rule_entity:status');
 
         $this->add_actions();
-
-        $cohortentity->get_column('name')
-            ->set_title(new lang_string('cohort', 'tool_dynamic_cohorts'));
 
         $this->add_filter_from_entity('rule_entity:name');
         $this->add_filter_from_entity('rule_entity:bulkprocessing');

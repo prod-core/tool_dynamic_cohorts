@@ -68,7 +68,7 @@ class rule_form extends dynamic_form {
             'cohortid',
             get_string('cohortid', 'tool_dynamic_cohorts'),
             $this->get_cohort_options(),
-            ['noselectionstring' => get_string('choosedots')]
+            ['noselectionstring' => get_string('choosedots'), 'multiple' => true]
         );
         $mform->addHelpButton('cohortid', 'cohortid', 'tool_dynamic_cohorts');
         $mform->addRule('cohortid', get_string('required'), 'required', null, 'client');
@@ -157,9 +157,11 @@ class rule_form extends dynamic_form {
         }
 
         // Add the currently selected cohort as it won't be in the list.
-        $cohort = $this->get_default_cohort();
-        if (!empty($cohort)) {
-            $options[$cohort->id] = $cohort->name;
+        $cohorts = $this->get_default_cohort();
+        if (!empty($cohorts)) {
+            foreach ($cohorts as $cohort) {
+                $options[$cohort->id] = $cohort->name;
+            }
         }
 
         return $options;
@@ -168,15 +170,16 @@ class rule_form extends dynamic_form {
     /**
      * Gets default cohort to be set into the form.
      *
-     * @return stdClass|null
+     * @return array|null
      */
-    protected function get_default_cohort(): ?stdClass {
+    protected function get_default_cohort(): ?array {
         global $DB;
 
         $rule = $this->get_rule();
 
         if (!empty($rule->get('cohortid'))) {
-            return $DB->get_record('cohort', ['id' => $rule->get('cohortid')]);
+            list($insql, $params) = $DB->get_in_or_equal(explode(',', $rule->get('cohortid')));
+            return $DB->get_records_select('cohort', "id {$insql}", $params);
         } else {
             return null;
         }

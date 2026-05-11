@@ -58,5 +58,24 @@ function xmldb_tool_dynamic_cohorts_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2024091300, 'tool', 'dynamic_cohorts');
     }
 
+    if ($oldversion < 2026031301) {
+        // Define key cohortid (foreign) to be dropped form tool_dynamic_cohorts.
+        $table = new xmldb_table('tool_dynamic_cohorts');
+        $key = new xmldb_key('cohortid', XMLDB_KEY_FOREIGN, ['cohortid'], 'cohort', ['id']);
+
+        // Launch drop key cohortid.
+        $dbman->drop_key($table, $key);
+
+        // Changing type of field cohortid on table tool_dynamic_cohorts to text.
+        $table = new xmldb_table('tool_dynamic_cohorts');
+        $field = new xmldb_field('cohortid', XMLDB_TYPE_TEXT, null, null, null, null, null, 'description');
+
+        // Launch change of type for field cohortid.
+        $dbman->change_field_type($table, $field);
+
+        // Dynamic_cohorts savepoint reached.
+        upgrade_plugin_savepoint(true, 2026031301, 'tool', 'dynamic_cohorts');
+    }
+
     return true;
 }

@@ -82,6 +82,7 @@ class rule_manager {
      */
     public static function build_data_for_form(rule $rule): array {
         $data = (array) $rule->to_record();
+        $data['cohortid'] = explode(',', $data['cohortid']);
         $data['conditionjson'] = '';
         $conditions = [];
 
@@ -126,7 +127,7 @@ class rule_manager {
         $ruledata = (object) [
             'name' => $formdata->name,
             'enabled' => $formdata->enabled,
-            'cohortid' => $formdata->cohortid,
+            'cohortid' => implode(',', $formdata->cohortid),
             'description' => $formdata->description,
             'bulkprocessing' => $formdata->bulkprocessing,
             'operator' => $formdata->operator,
@@ -144,15 +145,24 @@ class rule_manager {
                 rule_created::create(['other' => ['ruleid' => $rule->get('id')]])->trigger();
             } else {
                 $rule = new rule($formdata->id);
-                $oldcohortid = $rule->get('cohortid');
+                $oldcohortids = explode(',', $rule->get('cohortid'));
                 $rule->from_record($ruledata);
                 $rule->update();
                 rule_updated::create(['other' => ['ruleid' => $rule->get('id')]])->trigger();
             }
 
-            if ($oldcohortid != $formdata->cohortid) {
-                cohort_manager::unmanage_cohort($oldcohortid);
-                cohort_manager::manage_cohort($formdata->cohortid);
+            $cohortstoadd = array_diff($formdata->cohortid, $oldcohortids);
+            $cohortstoremove = array_diff($oldcohortids, $formdata->cohortid);
+
+            if ($cohortstoremove) {
+                foreach ($cohortstoremove as $cohortid) {
+                    cohort_manager::unmanage_cohort($cohortid);
+                }
+            }
+            if ($cohortstoadd) {
+                foreach ($cohortstoadd as $cohortid) {
+                    cohort_manager::manage_cohort($cohortid);
+                }
             }
 
             condition_manager::process_form($rule, $formdata);
@@ -188,8 +198,10 @@ class rule_manager {
             }
         }
 
-        if (!array_key_exists($formdata->cohortid, cohort_manager::get_cohorts())) {
-            throw new moodle_exception('Invalid rule data. Cohort is invalid: ' . $formdata->cohortid);
+        foreach ($formdata->cohortid as $cohortid) {
+            if (!array_key_exists($cohortid, cohort_manager::get_cohorts())) {
+                throw new moodle_exception('Invalid rule data. Cohort is invalid: ' . $formdata->cohortid);
+            }
         }
 
         if (!isset($formdata->conditionjson)) {
@@ -342,54 +354,56 @@ class rule_manager {
             return;
         }
 
-        $cohortid = $rule->get('cohortid');
+        $cohortids = explode(',', $rule->get('cohortid'));
 
-        if (!$DB->record_exists('cohort', ['id' => $cohortid])) {
-            $rule->mark_broken();
-            return;
-        }
+        foreach ($cohortids as $cohortid) {
+            if (!$DB->record_exists('cohort', ['id' => $cohortid])) {
+                $rule->mark_broken();
+                return;
+            }
 
-        $users = self::get_matching_users($rule, $userid);
+            $users = self::get_matching_users($rule, $userid);
 
-        $cohortmembersparams = ['cohortid' => $cohortid];
+            $cohortmembersparams = ['cohortid' => $cohortid];
 
-        if (!empty($userid)) {
-            $cohortmembersparams['userid'] = $userid;
-        }
+            if (!empty($userid)) {
+                $cohortmembersparams['userid'] = $userid;
+            }
 
-        $cohortmembers = $DB->get_records('cohort_members', $cohortmembersparams, '', 'userid');
+            $cohortmembers = $DB->get_records('cohort_members', $cohortmembersparams, '', 'userid');
 
-        $userstoadd = array_diff_key($users, $cohortmembers);
-        $userstodelete = array_diff_key($cohortmembers, $users);
+            $userstoadd = array_diff_key($users, $cohortmembers);
+            $userstodelete = array_diff_key($cohortmembers, $users);
 
-        if ($rule->is_bulk_processing()) {
-            $timeadded = time();
-            foreach (array_chunk($userstoadd, self::BULK_PROCESSING_SIZE) as $users) {
-                $records = [];
-                foreach ($users as $user) {
-                    $record = new \stdClass();
-                    $record->userid = $user->id;
-                    $record->cohortid = $cohortid;
-                    $record->timeadded = $timeadded;
-                    $records[] = $record;
+            if ($rule->is_bulk_processing()) {
+                $timeadded = time();
+                foreach (array_chunk($userstoadd, self::BULK_PROCESSING_SIZE) as $users) {
+                    $records = [];
+                    foreach ($users as $user) {
+                        $record = new \stdClass();
+                        $record->userid = $user->id;
+                        $record->cohortid = $cohortid;
+                        $record->timeadded = $timeadded;
+                        $records[] = $record;
+                    }
+                    $DB->insert_records('cohort_members', $records);
                 }
-                $DB->insert_records('cohort_members', $records);
-            }
 
-            foreach (array_chunk($userstodelete, self::BULK_PROCESSING_SIZE) as $users) {
-                $userids = array_column($users, 'userid');
-                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
-                $sql = "userid $insql AND cohortid = :cohort";
-                $inparams['cohort'] = $cohortid;
-                $DB->delete_records_select('cohort_members', $sql, $inparams);
-            }
-        } else {
-            foreach ($userstoadd as $user) {
-                cohort_add_member($cohortid, $user->id);
-            }
+                foreach (array_chunk($userstodelete, self::BULK_PROCESSING_SIZE) as $users) {
+                    $userids = array_column($users, 'userid');
+                    [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+                    $sql = "userid $insql AND cohortid = :cohort";
+                    $inparams['cohort'] = $cohortid;
+                    $DB->delete_records_select('cohort_members', $sql, $inparams);
+                }
+            } else {
+                foreach ($userstoadd as $user) {
+                    cohort_add_member($cohortid, $user->id);
+                }
 
-            foreach ($userstodelete as $user) {
-                cohort_remove_member($cohortid, $user->userid);
+                foreach ($userstodelete as $user) {
+                    cohort_remove_member($cohortid, $user->userid);
+                }
             }
         }
     }
