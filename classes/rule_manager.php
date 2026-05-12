@@ -151,8 +151,8 @@ class rule_manager {
                 rule_updated::create(['other' => ['ruleid' => $rule->get('id')]])->trigger();
             }
 
-            $cohortstoadd = array_diff($formdata->cohortid, $oldcohortids);
-            $cohortstoremove = array_diff($oldcohortids, $formdata->cohortid);
+            $cohortstoadd = (empty($oldcohortids)) ? $formdata->cohortid : array_diff($formdata->cohortid, $oldcohortids);
+            $cohortstoremove = (empty($oldcohortids)) ? [] : array_diff($oldcohortids, $formdata->cohortid);
 
             if ($cohortstoremove) {
                 foreach ($cohortstoremove as $cohortid) {
